@@ -64,7 +64,7 @@ function normalizeRecord(input: any): RecentActivityRecord | null {
     cid: String(input.cid ?? "Pending"),
     aiSummary: typeof input.aiSummary === "string" ? input.aiSummary : null,
     conditions: Array.isArray(input.conditions)
-      ? input.conditions.map((item) => String(item))
+      ? input.conditions.map((item: unknown) => String(item))
       : [],
     confidence,
   };

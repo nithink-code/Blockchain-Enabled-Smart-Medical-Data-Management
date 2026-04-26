@@ -13,11 +13,22 @@ export default async function Home() {
   // The Navbar will handle showing the appropriate 'Dashboard' link instead.
 
   return (
-    <div className="min-h-screen bg-transparent text-white selection:bg-blue-500/30">
-      {/* Dynamic Background Glow */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px]" />
+    <div className="relative min-h-screen bg-transparent text-white selection:bg-blue-500/30">
+      {/* Fixed video background */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <video
+          className="h-full w-full object-cover opacity-60"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        >
+          <source src="/Cinematic_Dark_Themed_Web_App_Background.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-linear-to-b from-black/35 via-black/55 to-black/75" />
+        <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-blue-500/20 blur-[130px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-pink-500/18 blur-[130px]" />
       </div>
 
       <main className="relative z-10">
@@ -26,10 +37,10 @@ export default async function Home() {
           <div className="app-shell flex flex-col items-center text-center">
             <div className="max-w-5xl">
               <div className="flex flex-col items-center justify-center space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <h1 className="mx-auto overflow-visible py-4 text-center text-4xl font-bold leading-[1.3] tracking-tight text-white sm:text-6xl lg:text-[5.5rem]">
-                  <span className="block overflow-visible pb-4 text-gradient">Medical Data Management.</span>
+                <h1 className="mx-auto overflow-visible py-4 text-center text-4xl font-bold leading-[1.3] tracking-tight sm:text-6xl lg:text-[5.5rem]">
+                  <span className="text-gradient-vivid block overflow-visible pb-4 drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">Medical Data Management.</span>
                 </h1>
-                <p className="mx-auto max-w-3xl text-center text-lg leading-relaxed text-zinc-400 sm:text-xl">
+                <p className="text-gradient-soft mx-auto max-w-3xl text-center text-lg leading-relaxed sm:text-xl">
                   MedChain utilizes explainable AI and blockchain technology to give patients full ownership and clear understanding of their medical history.
                 </p>
               </div>

@@ -66,16 +66,18 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <Link href="/sign-up" className="w-full sm:w-auto">
-                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-sky-500 via-blue-500 to-pink-500 px-12 text-sm font-semibold text-white shadow-lg shadow-blue-500/35 transition-all hover:scale-[1.02] hover:shadow-pink-500/25 active:scale-[0.98]">
-                    Get started
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
+                <Link
+                  href="/sign-up"
+                  className="inline-flex h-14 w-full min-w-56 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-sky-500 via-blue-500 to-pink-500 px-12 text-sm font-semibold text-white shadow-lg shadow-blue-500/35 transition-all hover:scale-[1.02] hover:shadow-pink-500/25 active:scale-[0.98] sm:w-auto"
+                >
+                  Get started
+                  <ArrowRight className="h-5 w-5" />
                 </Link>
-                <Link href="/features" className="w-full sm:w-auto">
-                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center rounded-2xl border border-pink-300/45 bg-linear-to-r from-blue-500/25 to-pink-500/25 px-12 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:scale-[1.02] hover:border-pink-200/70 active:scale-[0.98]">
-                    Explore more
-                  </button>
+                <Link
+                  href="/features"
+                  className="inline-flex h-14 w-full min-w-56 items-center justify-center rounded-2xl border border-pink-300/45 bg-linear-to-r from-blue-500/25 to-pink-500/25 px-12 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:scale-[1.02] hover:border-pink-200/70 active:scale-[0.98] sm:w-auto"
+                >
+                  Explore more
                 </Link>
               </div>
             </div>

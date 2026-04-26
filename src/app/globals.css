@@ -129,6 +129,21 @@ html {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.text-gradient-vivid {
+  background: linear-gradient(100deg, #7dd3fc 0%, #60a5fa 35%, #818cf8 60%, #f472b6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-soft {
+  background: linear-gradient(95deg, #dbeafe 0%, #bfdbfe 40%, #c4b5fd 70%, #f9a8d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .info-cards{
   margin-top: 50px;
   padding: 20px;

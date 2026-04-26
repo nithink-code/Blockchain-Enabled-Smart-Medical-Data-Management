@@ -5,72 +5,75 @@ import {
   Lock,
   Activity,
   FileSearch,
-  Fingerprint,
   ShieldCheck,
-  Database,
-  Sparkles,
-  ChevronRight,
   ArrowRight,
   Clock3,
   Stethoscope
 } from "lucide-react";
 import { AuthNavbar } from "./auth-navbar";
+import { FloatingNav } from "./floating-nav";
 
 export default function Home() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="min-h-screen bg-transparent text-white selection:bg-blue-500/30">
-      {/* Dynamic Background Glow */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px]" />
+    <div className="relative min-h-screen bg-transparent text-white selection:bg-blue-500/30">
+      {/* Fixed video background */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <video
+          className="h-full w-full object-cover opacity-60"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        >
+          <source src="/Cinematic_Dark_Themed_Web_App_Background.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-linear-to-b from-black/35 via-black/55 to-black/75" />
+        <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-blue-500/20 blur-[130px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-pink-500/18 blur-[130px]" />
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
-        <div className="app-shell flex h-20 items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-blue-600 blur-lg opacity-40 group-hover:opacity-70 transition-opacity" />
-              <div className="relative rounded-xl bg-blue-600 p-2.5 shadow-xl shadow-blue-500/20">
-                <Shield className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-              Med<span className="text-blue-500">Chain</span>
-            </span>
-          </Link>
+      <div className="fixed left-4 top-4 z-50 sm:left-6 sm:top-5">
+        <Link href="/" className="group flex items-center gap-3.5">
+          <div className="relative rounded-xl border border-white/20 bg-black/25 p-2.5 backdrop-blur-md transition-all group-hover:border-blue-300/50">
+            <Shield className="h-5 w-5 text-sky-300" />
+          </div>
+          <span className="text-lg font-bold tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] sm:text-xl">
+            Med<span className="text-blue-300">Chain</span>
+          </span>
+        </Link>
+      </div>
 
-          <nav className="hidden items-center gap-10 text-sm font-medium text-zinc-400 md:flex">
-            <Link href="/features" className="transition-colors hover:text-white">Features</Link>
-            <Link href="/workflow" className="transition-colors hover:text-white">Workflow</Link>
-            <Link href="/security" className="transition-colors hover:text-white">Security</Link>
-          </nav>
+      <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-5">
+        <AuthNavbar />
+      </div>
 
-          <AuthNavbar />
-        </div>
-      </header>
+      <FloatingNav />
 
       <main className="relative z-10">
         <section className="relative flex min-h-[85vh] items-center justify-center py-20 lg:py-32">
-          <div className="app-shell flex flex-col items-center text-center">
+          <div className="app-shell relative z-10 flex flex-col items-center text-center">
             <div className="max-w-5xl space-y-12">
               <div className="flex flex-col items-center justify-center space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <h1 className="mx-auto overflow-visible py-4 text-center text-4xl font-bold leading-[1.3] tracking-tight text-white sm:text-6xl lg:text-[5.5rem]">
-                  <span className="block overflow-visible pb-4 text-gradient">Medical Data Management.</span>
+                <h1 className="mx-auto overflow-visible py-4 text-center text-4xl font-bold leading-[1.3] tracking-tight sm:text-6xl lg:text-[5.5rem]">
+                  <span className="text-gradient-vivid block overflow-visible pb-4 drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">Medical Data Management.</span>
                 </h1>
-                <p className="mx-auto max-w-3xl text-center text-lg leading-relaxed text-zinc-400 sm:text-xl">
+                <p className="text-gradient-soft mx-auto max-w-3xl text-center text-lg leading-relaxed sm:text-xl">
                   MedChain utilizes explainable AI and blockchain technology to give patients full ownership and clear understanding of their medical history.
                 </p>
               </div>
 
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 <Link href="/sign-up" className="w-full sm:w-auto">
-                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center gap-2 rounded-2xl bg-white px-12 text-sm font-semibold text-black transition-all hover:bg-zinc-200 hover:scale-[1.02] active:scale-[0.98]">
+                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-sky-500 via-blue-500 to-pink-500 px-12 text-sm font-semibold text-white shadow-lg shadow-blue-500/35 transition-all hover:scale-[1.02] hover:shadow-pink-500/25 active:scale-[0.98]">
                     Get started
                     <ArrowRight className="h-5 w-5" />
                   </button>
                 </Link>
                 <Link href="/features" className="w-full sm:w-auto">
-                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-12 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] active:scale-[0.98]">
+                  <button className="inline-flex h-14 w-full min-w-55 items-center justify-center rounded-2xl border border-pink-300/45 bg-linear-to-r from-blue-500/25 to-pink-500/25 px-12 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:scale-[1.02] hover:border-pink-200/70 active:scale-[0.98]">
                     Explore more
                   </button>
                 </Link>
@@ -114,8 +117,7 @@ export default function Home() {
         </section>
 
 
-        <section id="workflow" className="section-pad relative overflow-hidden bg-zinc-950 py-32 lg:py-48">
-          <div className="absolute inset-0 bg-blue-600/5 blur-[120px] translate-y-1/2" />
+        <section id="workflow" className="section-pad relative overflow-hidden py-32 lg:py-48">
           <div className="app-shell relative z-10 flex flex-col items-center text-center">
             <div className="mx-auto flex w-full max-w-6xl flex-col items-center">
               <div className="flex w-full flex-col items-center pt-32 detail-cards">
@@ -139,41 +141,77 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="relative border-t border-white/5 bg-black/40 py-20 lg:py-24">
+      <footer className="relative border-t border-white/5 bg-black/50 py-24 lg:py-28">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-blue-500/10 to-transparent" />
-        
-        <div className="app-shell flex flex-col items-center text-center">
-          <Link href="/" className="flex items-center gap-3 group mb-6">
-            <div className="rounded-xl bg-blue-600/10 p-2 text-blue-500 border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors">
-              <Shield className="h-5 w-5" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_60%)]" />
+
+        <div className="app-shell relative z-10">
+          <div className="grid items-start gap-14 border-b border-white/10 pb-12 text-left md:grid-cols-12 md:gap-x-10 md:gap-y-12 md:pb-14 lg:gap-x-16 lg:pb-16">
+            <div className="flex flex-col gap-6 md:col-span-5 lg:pr-10">
+              <Link href="/" className="group inline-flex items-center gap-3 self-start">
+                <div className="rounded-xl border border-blue-500/20 bg-blue-600/10 p-2 text-blue-500 transition-colors group-hover:bg-blue-500/20">
+                  <Shield className="h-5 w-5" />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">
+                  Med<span className="text-blue-500">Chain</span>
+                </span>
+              </Link>
+
+              <p className="max-w-xl text-lg leading-relaxed text-zinc-300/90">
+                Decentralized medical intelligence for secure patient data ownership, transparent sharing, and explainable AI-powered clinical insights.
+              </p>
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">MedChain</span>
-          </Link>
-          
-          <p className="max-w-md text-sm leading-relaxed text-zinc-400 mb-10">
-            The world's first decentralized medical intelligence platform. Empowering patients with sovereign ownership.
-          </p>
 
-          <ul className="flex flex-wrap justify-center gap-8 text-sm text-zinc-400 mb-12">
-            <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-            <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-            <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-            <li><Link href="#" className="hover:text-white transition-colors">Contact</Link></li>
-          </ul>
+            <div className="md:col-span-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-zinc-500">Platform</h3>
+              <ul className="mt-6 flex flex-col gap-4 text-lg text-zinc-200">
+                <li>
+                  <Link href="/features" className="transition-colors hover:text-white">Features</Link>
+                </li>
+                <li>
+                  <Link href="/workflow" className="transition-colors hover:text-white">Workflow</Link>
+                </li>
+                <li>
+                  <Link href="/security" className="transition-colors hover:text-white">Security</Link>
+                </li>
+                <li>
+                  <Link href="/dashboard" className="transition-colors hover:text-white">Dashboard</Link>
+                </li>
+              </ul>
+            </div>
 
-          <div className="w-full max-w-2xl border-t border-white/5 pt-10 flex flex-col items-center gap-6 md:flex-row md:justify-between">
-            <p className="text-xs text-zinc-500 order-2 md:order-1">
-              © 2026 MedChain Labs. Sovereign Intelligence for Healthcare.
+            <div className="md:col-span-4">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-zinc-500">Account</h3>
+              <ul className="mt-6 flex flex-col gap-4 text-lg text-zinc-200">
+                <li>
+                  <Link href="/sign-in" className="transition-colors hover:text-white">Sign In</Link>
+                </li>
+                <li>
+                  <Link href="/sign-up" className="transition-colors hover:text-white">Create Account</Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/consent" className="transition-colors hover:text-white">Consent Management</Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/reports" className="transition-colors hover:text-white">Medical Reports</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6 pt-8 text-left md:flex-row md:items-center md:justify-between md:pt-9">
+            <p className="text-sm text-zinc-400">
+              © {currentYear} MedChain Labs. All rights reserved.
             </p>
-            <div className="flex gap-6 order-1 md:order-2">
-              <Link href="#" className="text-zinc-500 hover:text-white transition-colors">
-                <Activity className="h-4 w-4" />
+            <div className="flex items-center gap-7 md:justify-end">
+              <Link href="/security" className="text-zinc-400 transition-colors hover:text-white" aria-label="Security">
+                <ShieldCheck className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-zinc-500 hover:text-white transition-colors">
-                <ShieldCheck className="h-4 w-4" />
+              <Link href="/workflow" className="text-zinc-400 transition-colors hover:text-white" aria-label="Workflow">
+                <Activity className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-zinc-500 hover:text-white transition-colors">
-                <Lock className="h-4 w-4" />
+              <Link href="/dashboard/consent" className="text-zinc-400 transition-colors hover:text-white" aria-label="Consent and Privacy">
+                <Lock className="h-5 w-5" />
               </Link>
             </div>
           </div>
@@ -211,9 +249,9 @@ function FeatureCard({ icon, title, description, color }: { icon: React.ReactNod
 
 function WorkflowPill({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="group relative flex aspect-square flex-col items-center justify-center gap-5 rounded-[3rem] border border-white/5 bg-white/2 p-10 transition-all duration-500 hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] hover:-translate-y-3">
-      <div className="absolute inset-0 rounded-[3rem] bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="relative rounded-2xl bg-blue-500/10 p-5 text-blue-500 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+    <div className="group relative flex aspect-square flex-col items-center justify-center gap-5 rounded-[3rem] border border-white/8 bg-zinc-900/35 p-10 transition-all duration-500 hover:-translate-y-3 hover:border-white/20 hover:bg-zinc-900/60 hover:shadow-[0_0_50px_-12px_rgba(255,255,255,0.18)]">
+      <div className="absolute inset-0 rounded-[3rem] bg-linear-to-br from-white/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="relative rounded-2xl bg-white/8 p-5 text-zinc-200 transition-all duration-500 group-hover:scale-110 group-hover:bg-white/12">
         {icon}
       </div>
       <span className="relative text-center text-xs font-bold tracking-[0.2em] uppercase text-zinc-500 group-hover:text-white transition-colors">

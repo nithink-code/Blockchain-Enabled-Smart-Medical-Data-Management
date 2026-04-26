@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { PageLoader } from "@/components/page-loader";
+import { Suspense } from "react";
+
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -16,13 +21,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className="h-full scroll-smooth">
-        <body className={`${manrope.className} min-h-screen bg-black text-white antialiased`}>
+    <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth">
+      <body className={`${manrope.className} min-h-screen bg-black text-white antialiased`}>
+        <ClerkProvider
+          signInForceRedirectUrl="/dashboard"
+          signUpForceRedirectUrl="/dashboard"
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
+        >
+          <Suspense fallback={null}>
+            <PageLoader />
+          </Suspense>
+          <Navbar />
           {children}
-        </body>
-      </html>
-    </ClerkProvider>
+          <Footer />
+
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
-

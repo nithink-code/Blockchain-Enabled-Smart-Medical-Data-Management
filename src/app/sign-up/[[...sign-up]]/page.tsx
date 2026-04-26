@@ -1,27 +1,45 @@
 import { SignUp } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { Shield } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function Page() {
+export default async function Page() {
+  const { userId } = await auth();
+  if (userId) redirect("/dashboard");
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-black p-6 pt-32 selection:bg-blue-500/30">
+
+      {/* Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px]" />
+      </div>
+
+      <div className="relative w-full max-w-md space-y-8 animate-fade-in">
         <div className="flex flex-col items-center">
-          <Link href="/" className="mb-8 flex items-center gap-2">
-            <div className="rounded-xl bg-blue-600 p-2">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-900">MedChain</span>
-          </Link>
+
+          
           <SignUp
             path="/sign-up"
             routing="path"
+            signInUrl="/sign-in"
+            forceRedirectUrl="/dashboard"
+            fallbackRedirectUrl="/dashboard"
             appearance={{
               elements: {
-                formButtonPrimary: "rounded-xl bg-blue-600 text-sm font-bold hover:bg-blue-700",
-                card: "rounded-3xl border border-slate-200 shadow-2xl",
-                headerTitle: "text-2xl font-black text-slate-900",
-                headerSubtitle: "font-medium text-slate-500",
+                rootBox: "w-full",
+                card: "rounded-[32px] border border-white/10 bg-zinc-950/50 backdrop-blur-xl shadow-2xl p-2",
+                headerTitle: "text-white text-2xl font-bold",
+                headerSubtitle: "text-zinc-500 font-medium",
+                formButtonPrimary: "rounded-2xl bg-blue-600 py-3 text-sm font-bold hover:bg-blue-500 transition-all",
+                formFieldLabel: "text-zinc-400 font-semibold",
+                formFieldInput: "rounded-xl border-white/5 bg-white/5 text-white focus:ring-blue-500/50 focus:border-blue-500/30",
+                footerActionLink: "text-blue-400 hover:text-blue-300 font-bold",
+                dividerLine: "bg-white/5",
+                dividerText: "text-zinc-600",
+                socialButtonsBlockButton: "rounded-xl border-white/5 bg-white/5 text-white hover:bg-white/10",
               },
             }}
           />

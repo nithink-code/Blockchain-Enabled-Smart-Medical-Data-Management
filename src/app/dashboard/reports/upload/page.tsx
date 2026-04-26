@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { saveRecentActivity } from "@/lib/recent-activity";
 import { 
   UploadCloud, 
   FileText, 
@@ -108,6 +109,36 @@ export default function UploadReportPage() {
       if (!response.ok) throw new Error("Analysis failed");
 
       const data = await response.json();
+
+      // ── Persist result to localStorage so dashboard & reports page update ──
+      const prediction: string = data?.analysis?.prediction ?? "Unknown";
+      const malignantProb: number = data?.analysis?.probability?.malignant ?? 0;
+      const conditions: string[] = prediction === "Malignant"
+        ? ["Malignant Finding Detected"]
+        : [];
+      const extractedFields = data?.analysis?.extracted_data ?? {};
+      const fieldCount = Object.keys(extractedFields).length;
+
+      saveRecentActivity({
+        id: `${Date.now()}`,
+        title: file.name.replace(/\.[^.]+$/, "") || "Medical Report",
+        date: new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        provider: "Patient Upload",
+        status: "Analyzed",
+        type: file.name.endsWith(".pdf") ? "PDF Report" : "Image Scan",
+        cid: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+        aiSummary:
+          data?.extractedContent
+            ? data.extractedContent.substring(0, 240) + "..."
+            : `Prediction: ${prediction}. Malignant probability: ${(malignantProb * 100).toFixed(1)}%. ${fieldCount} clinical fields extracted.`,
+        conditions,
+        confidence: Math.round(Math.max(malignantProb, 1 - malignantProb) * 100),
+      });
+
       setAnalysisResult(data);
 
       // Transition through other UI stages

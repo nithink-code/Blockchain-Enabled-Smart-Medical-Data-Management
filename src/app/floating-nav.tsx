@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from "react";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
-  { href: "/workflow", label: "Workflow" },
   { href: "/security", label: "Security" },
 ];
 
@@ -25,7 +24,6 @@ export function FloatingNav() {
   const activeHref = useMemo(() => {
     if (pathname === "/") return "/";
     if (pathname.startsWith("/features")) return "/features";
-    if (pathname.startsWith("/workflow")) return "/workflow";
     if (pathname.startsWith("/security")) return "/security";
     return "";
   }, [pathname]);

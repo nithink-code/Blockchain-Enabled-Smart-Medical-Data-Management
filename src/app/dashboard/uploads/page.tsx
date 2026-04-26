@@ -3,6 +3,7 @@
 import { Upload, FileText, CheckCircle2, Clock, Trash2, ExternalLink, X, Loader, Activity, User, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { saveRecentActivity } from "@/lib/recent-activity";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -267,6 +268,8 @@ export default function UploadsPage() {
       if (response.ok) {
         const result = await response.json();
         console.log("Analysis Result:", result);
+        const analysis = result.data.analysis;
+        const patient = result.data.patient;
         
         // Add the new document to the list
         const newDoc = {
@@ -279,7 +282,30 @@ export default function UploadsPage() {
         };
         
         setDocuments(prev => [newDoc, ...prev]);
-        setAnalysisResult(result.data.analysis);
+        setAnalysisResult(analysis);
+
+        saveRecentActivity({
+          id: `report-${Date.now()}`,
+          title: selectedFile.name.replace(/\.[^.]+$/, "") || "Medical Report",
+          date: new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          }),
+          provider: `${patient.name} • ${patient.age} • ${patient.gender}`,
+          status: "Analyzed",
+          type: "Clinical Report",
+          cid: `Qm${Math.random().toString(36).slice(2, 18)}${Math.random().toString(36).slice(2, 10)}`,
+          aiSummary: analysis?.prediction
+            ? `${analysis.prediction} report with ${(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100).toFixed(1)}% confidence.`
+            : "AI analysis completed.",
+          conditions: analysis?.explanation?.lime_local_impact
+            ? analysis.explanation.lime_local_impact.slice(0, 3).map(([feature]: [string, number]) => feature)
+            : [],
+          confidence: analysis?.probability
+            ? Math.round(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100)
+            : null,
+        });
         
         setUploadProgress(100);
         setTimeout(() => {

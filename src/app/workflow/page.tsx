@@ -3,11 +3,8 @@ import { ChevronLeft, Activity, Clock3, Stethoscope, Shield } from "lucide-react
 
 export default function WorkflowPage() {
   return (
-    <div className="min-h-screen bg-black text-white p-8 md:p-20">
-      <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-12">
-        <ChevronLeft size={20} />
-        Back to Home
-      </Link>
+    <div className="min-h-screen bg-black text-white p-8 pt-32 md:p-20 md:pt-40">
+
       
       <div className="max-w-4xl space-y-12">
         <div className="space-y-4">

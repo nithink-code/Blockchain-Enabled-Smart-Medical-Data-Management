@@ -40,31 +40,46 @@ export function saveRecentActivity(record: RecentActivityRecord) {
     const existing = loadRecentActivity();
     const next = [record, ...existing.filter((item) => item.id !== record.id)].slice(0, MAX_RECORDS);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("medchain:recent-activity-updated"));
   } catch {
     // Ignore storage errors in the browser.
   }
 }
 
-function normalizeRecord(input: any): RecentActivityRecord | null {
-  if (!input || typeof input !== "object") return null;
+export function deleteRecentActivity(recordId: string) {
+  if (typeof window === "undefined") return;
 
-  const status = input.status === "Processing" ? "Processing" : "Analyzed";
+  try {
+    const existing = loadRecentActivity();
+    const next = existing.filter((item) => item.id !== recordId);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("medchain:recent-activity-updated"));
+  } catch {
+    // Ignore storage errors in the browser.
+  }
+}
+
+function normalizeRecord(input: unknown): RecentActivityRecord | null {
+  if (!input || typeof input !== "object") return null;
+  const value = input as Record<string, unknown>;
+
+  const status = value.status === "Processing" ? "Processing" : "Analyzed";
   const confidence =
-    typeof input.confidence === "number" && Number.isFinite(input.confidence)
-      ? input.confidence
+    typeof value.confidence === "number" && Number.isFinite(value.confidence)
+      ? value.confidence
       : null;
 
   return {
-    id: String(input.id ?? Date.now()),
-    title: String(input.title ?? "Medical Report"),
-    date: String(input.date ?? new Date().toLocaleDateString()),
-    provider: String(input.provider ?? "Patient Upload"),
+    id: String(value.id ?? Date.now()),
+    title: String(value.title ?? "Medical Report"),
+    date: String(value.date ?? new Date().toLocaleDateString()),
+    provider: String(value.provider ?? "Patient Upload"),
     status,
-    type: String(input.type ?? "Report"),
-    cid: String(input.cid ?? "Pending"),
-    aiSummary: typeof input.aiSummary === "string" ? input.aiSummary : null,
-    conditions: Array.isArray(input.conditions)
-      ? input.conditions.map((item: unknown) => String(item))
+    type: String(value.type ?? "Report"),
+    cid: String(value.cid ?? "Pending"),
+    aiSummary: typeof value.aiSummary === "string" ? value.aiSummary : null,
+    conditions: Array.isArray(value.conditions)
+      ? value.conditions.map((item: unknown) => String(item))
       : [],
     confidence,
   };

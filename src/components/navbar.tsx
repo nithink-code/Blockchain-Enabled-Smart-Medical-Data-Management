@@ -5,10 +5,42 @@ import { Shield } from "lucide-react";
 import { AuthNavbar } from "./auth-navbar";
 import { DashboardNavLink } from "./dashboard-nav-link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+
+type Role = "patient" | "doctor" | null;
 
 export function Navbar() {
   const pathname = usePathname();
-  
+  const { isLoaded, isSignedIn } = useAuth();
+  const [role, setRole] = useState<Role>(null);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    let cancelled = false;
+
+    fetch("/api/user/sync", { method: "POST" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) setRole(data.role ?? "patient");
+      })
+      .catch(() => {
+        fetch("/api/user/me")
+          .then((r) => r.json())
+          .then((data) => {
+            if (!cancelled) setRole(data.role ?? "patient");
+          })
+          .catch(() => {
+            if (!cancelled) setRole("patient");
+          });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
+
   // Safety check for pathname
   if (!pathname) return null;
   
@@ -39,12 +71,14 @@ export function Navbar() {
           >
             Home
           </Link>
-          <Link 
-            href="/dashboard/uploads" 
-            className={`transition-colors hover:text-white cursor-pointer ${pathname === "/dashboard/uploads" ? "text-white" : ""}`}
-          >
-            Uploads
-          </Link>
+          {role !== "doctor" && (
+            <Link 
+              href="/dashboard/uploads" 
+              className={`transition-colors hover:text-white cursor-pointer ${pathname === "/dashboard/uploads" ? "text-white" : ""}`}
+            >
+              Uploads
+            </Link>
+          )}
           <DashboardNavLink />
         </nav>
 

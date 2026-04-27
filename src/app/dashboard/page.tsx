@@ -9,8 +9,13 @@ import {
   Calendar,
   User,
   Database,
+  Trash2,
 } from "lucide-react";
-import { loadRecentActivity, type RecentActivityRecord } from "@/lib/recent-activity";
+import {
+  loadRecentActivity,
+  deleteRecentActivity,
+  type RecentActivityRecord,
+} from "@/lib/recent-activity";
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -31,10 +36,12 @@ export default function Dashboard() {
     refreshReports();
     window.addEventListener("storage", refreshReports);
     window.addEventListener("focus", refreshReports);
+    window.addEventListener("medchain:recent-activity-updated", refreshReports as EventListener);
 
     return () => {
       window.removeEventListener("storage", refreshReports);
       window.removeEventListener("focus", refreshReports);
+      window.removeEventListener("medchain:recent-activity-updated", refreshReports as EventListener);
     };
   }, [mounted]);
 
@@ -122,11 +129,19 @@ export default function Dashboard() {
                     date={report.date}
                     provider={report.provider}
                     status={report.status}
-                    cid={report.cid.length > 15 ? report.cid.slice(0, 8) + "..." + report.cid.slice(-5) : report.cid}
+                    cid={
+                      report.cid.length > 15
+                        ? `${report.cid.slice(0, 8)}...${report.cid.slice(-5)}`
+                        : report.cid
+                    }
                     summary={report.aiSummary}
                     confidence={report.confidence}
                     conditions={report.conditions}
                     type={report.type}
+                    onDelete={() => {
+                      deleteRecentActivity(report.id);
+                      setRecentReports(loadRecentActivity());
+                    }}
                   />
                 ))
               ) : (
@@ -185,6 +200,7 @@ function ReportItem({
   confidence,
   conditions,
   type,
+  onDelete,
 }: {
   title: string;
   date: string;
@@ -195,6 +211,7 @@ function ReportItem({
   confidence?: number | null;
   conditions?: string[];
   type?: string;
+  onDelete?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -248,6 +265,18 @@ function ReportItem({
           </div>
         </div>
         <div className="flex items-center gap-5 pl-4">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete?.();
+            }}
+            aria-label={`Delete ${title} record`}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/5 bg-white/[0.02] text-zinc-600 transition-all hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-400"
+            title="Delete record"
+          >
+            <Trash2 size={14} />
+          </button>
           <span
             className={`text-[10px] font-bold px-4 py-1.5 rounded-full border tracking-wider uppercase ${
               status === "Analyzed"

@@ -1,11 +1,14 @@
 "use client";
 
 import { Upload, FileText, CheckCircle2, Clock, Trash2, ExternalLink, X, Loader, Activity, User, Info } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { saveRecentActivity } from "@/lib/recent-activity";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+const ANALYSIS_STORAGE_KEY = "medchain:uploads-analysis-result";
+let persistedAnalysisCacheKey: string | null = null;
+let persistedAnalysisCacheValue: unknown = null;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -37,6 +40,66 @@ function normalizeFeatureValue(value: number | null, min: number, max: number) {
   if (value === null) return 0.5;
   if (max === min) return 0.5;
   return clamp((value - min) / (max - min), 0, 1);
+}
+
+function loadPersistedAnalysisResult() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = window.localStorage.getItem(ANALYSIS_STORAGE_KEY);
+    if (!raw) return null;
+
+    if (raw === persistedAnalysisCacheKey) {
+      return persistedAnalysisCacheValue;
+    }
+
+    persistedAnalysisCacheKey = raw;
+    persistedAnalysisCacheValue = JSON.parse(raw);
+    return persistedAnalysisCacheValue;
+  } catch {
+    return null;
+  }
+}
+
+function persistAnalysisResult(analysisResult: unknown) {
+  if (typeof window === "undefined") return;
+
+  try {
+    if (analysisResult) {
+      const serialized = JSON.stringify(analysisResult);
+      window.localStorage.setItem(ANALYSIS_STORAGE_KEY, serialized);
+      persistedAnalysisCacheKey = serialized;
+      persistedAnalysisCacheValue = analysisResult;
+    } else {
+      window.localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+      persistedAnalysisCacheKey = null;
+      persistedAnalysisCacheValue = null;
+    }
+    window.dispatchEvent(new Event("medchain:uploads-analysis-updated"));
+  } catch {
+    // Ignore browser storage errors.
+  }
+}
+
+function subscribeToAnalysisStore(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  const handler = () => onStoreChange();
+  window.addEventListener("storage", handler);
+  window.addEventListener("medchain:uploads-analysis-updated", handler as EventListener);
+
+  return () => {
+    window.removeEventListener("storage", handler);
+    window.removeEventListener("medchain:uploads-analysis-updated", handler as EventListener);
+  };
+}
+
+function usePersistedAnalysisResult() {
+  return useSyncExternalStore(
+    subscribeToAnalysisStore,
+    loadPersistedAnalysisResult,
+    () => null
+  );
 }
 
 function buildLimeData(analysisResult: any) {
@@ -226,8 +289,10 @@ export default function UploadsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [documents, setDocuments] = useState<any[]>([]);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const analysisResult: any = usePersistedAnalysisResult();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const allowedFileTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
 
   const limeFigure = analysisResult ? buildLimeData(analysisResult) : null;
 
@@ -235,10 +300,10 @@ export default function UploadsPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type === "application/pdf") {
+    if (file && allowedFileTypes.includes(file.type)) {
       setSelectedFile(file);
     } else {
-      alert("Please upload only PDF documents.");
+      alert("Please upload a PDF, PNG, or JPEG file.");
       e.target.value = "";
     }
   };
@@ -282,7 +347,7 @@ export default function UploadsPage() {
         };
         
         setDocuments(prev => [newDoc, ...prev]);
-        setAnalysisResult(analysis);
+        persistAnalysisResult(analysis);
 
         saveRecentActivity({
           id: `report-${Date.now()}`,
@@ -327,11 +392,8 @@ export default function UploadsPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-14rem)] w-full max-w-6xl flex-col justify-center space-y-14 px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 lg:px-8">
-      <div
-        className="mx-auto flex max-w-4xl flex-col items-center text-center"
-        style={{ paddingTop: "24px", marginTop: "140px", marginLeft: "160px"}}
-      >
+    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col justify-start space-y-14 px-6 pb-20 pt-28 animate-in fade-in slide-in-from-bottom-4 duration-700 sm:pt-32 lg:px-8 lg:pt-36">
+      <div className="mx-auto flex max-w-4xl flex-col items-center text-center pt-2 sm:pt-4 mt-30! ml-40!">
         <div className="space-y-4 mb-10!">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl mb-5!">
             My <span className="text-blue-500">Uploads</span>
@@ -353,24 +415,24 @@ export default function UploadsPage() {
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 pt-0 ml-30! p-5!">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-7 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center justify-center gap-3 border-b border-white/5 pb-4 mb-6 text-center">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-10 px-4 sm:px-6 lg:px-10 ml-15! mr-15!">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl">
+          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">Extracted Data</h3>
           </div>
 
           {analysisResult ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {Object.entries(analysisResult.extracted_data).map(([key, value]: [string, any]) => (
-                <div key={key} className="flex items-center justify-between rounded-lg border border-white/5 bg-white/5 px-4 py-4">
+                <div key={key} className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-5 py-4.5">
                   <span className="font-medium text-zinc-400">{key}</span>
                   <span className="font-bold text-white">
                     {typeof value === "number" ? value.toFixed(2).replace(/\.00$/, "") : value}
                   </span>
                 </div>
               ))}
-              <div className="mt-6 border-t border-white/5 pt-6 space-y-4">
+              <div className="mt-7 border-t border-white/5 pt-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-zinc-400">Prediction</span>
                   <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${analysisResult.prediction === 'Malignant' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
@@ -395,13 +457,13 @@ export default function UploadsPage() {
           )}
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
-          <div className="mb-6 flex items-center justify-center gap-3 border-b border-white/5 pb-4 text-center">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl min-h-[520px]">
+          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">LIME Local Impact (Waterfall Plot)</h3>
           </div>
 
-          <div className="flex h-[340px] w-full items-center justify-center">
+          <div className="flex h-[380px] w-full items-center justify-center">
             {analysisResult ? (
               <Plot
                 data={limeFigure?.data ?? []}
@@ -419,13 +481,13 @@ export default function UploadsPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
-          <div className="mb-6 flex items-center justify-center gap-3 border-b border-white/5 pb-4 text-center">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl min-h-[520px]">
+          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">SHAP Global Attribution</h3>
           </div>
 
-          <div className="flex h-[340px] w-full items-center justify-center">
+          <div className="flex h-[380px] w-full items-center justify-center">
             {analysisResult?.explanation?.shap_global_contribution ? (
               <Plot
                 data={shapFigure?.data ?? []}
@@ -519,7 +581,7 @@ export default function UploadsPage() {
                     <div className="relative mb-4!">
                       <input 
                         type="file"
-                        accept=".pdf"
+                        accept={allowedFileTypes.join(",")}
                         required
                         onChange={handleFileChange}
                         className="hidden"

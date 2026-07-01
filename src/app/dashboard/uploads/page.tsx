@@ -301,10 +301,10 @@ export default function UploadsPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-14rem)] w-full max-w-6xl flex-col justify-center space-y-14 px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 lg:px-8">
+    <div className="mx-auto grid min-h-[calc(100vh-14rem)] w-full max-w-none place-items-center gap-14 px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 lg:px-8">
       <div
-        className="mx-auto flex max-w-4xl flex-col items-center text-center"
-        style={{ paddingTop: "24px", marginTop: "140px", marginLeft: "160px"}}
+        className="mx-auto flex w-full flex-col items-center text-center justify-self-center lg:w-[50vw]"
+        style={{ paddingTop: "24px", marginTop: "140px" }}
       >
         <div className="space-y-4 mb-10!">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl mb-5!">
@@ -327,8 +327,8 @@ export default function UploadsPage() {
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 pt-0 ml-30! p-5!">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-7 shadow-2xl backdrop-blur-xl">
+      <div className="mx-auto grid w-full gap-8 pt-0 px-0 justify-items-stretch justify-self-center lg:w-[50vw]">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-7 shadow-2xl backdrop-blur-xl">
           <div className="flex items-center justify-center gap-3 border-b border-white/5 pb-4 mb-6 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">Extracted Data</h3>
@@ -369,7 +369,7 @@ export default function UploadsPage() {
           )}
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
           <div className="mb-6 flex items-center justify-center gap-3 border-b border-white/5 pb-4 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">LIME Local Impact (Waterfall Plot)</h3>
@@ -393,7 +393,7 @@ export default function UploadsPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-6 shadow-2xl backdrop-blur-xl min-h-[440px]">
           <div className="mb-6 flex items-center justify-center gap-3 border-b border-white/5 pb-4 text-center">
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">SHAP Global Attribution</h3>
@@ -443,9 +443,9 @@ export default function UploadsPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleUpload} className="space-y-6 max-w-lg mx-auto w-full">
-                <div className="space-y-4 ml-20! mt-4!">
-                  <div className="space-y-3 mb-4!">
+              <form onSubmit={handleUpload} className="mx-auto w-full max-w-lg space-y-6">
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-3">
                     <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Full Name</label>
                     <input 
                       type="text"
@@ -458,7 +458,7 @@ export default function UploadsPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-3 mb-4!">
+                    <div className="space-y-3">
                       <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Age</label>
                       <input 
                         type="number"
@@ -471,7 +471,7 @@ export default function UploadsPage() {
                     </div>
                     <div className="space-y-3">
                       <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Gender</label>
-                      <div className="relative mb-4!">
+                      <div className="relative">
                         <select 
                           value={formData.gender}
                           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
@@ -488,9 +488,9 @@ export default function UploadsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-4">
+                    <div className="space-y-4 pt-4">
                     <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Medical Report (PDF Only)</label>
-                    <div className="relative mb-4!">
+                    <div className="relative">
                       <input 
                         type="file"
                         accept=".pdf"
@@ -501,7 +501,7 @@ export default function UploadsPage() {
                       />
                       <label 
                         htmlFor="file-upload"
-                        className={`flex w-full mt-5! cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
+                        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
                       >
                         <div className={`rounded-full p-4 transition-colors ${selectedFile ? 'bg-blue-500/10 text-blue-400' : 'bg-zinc-900/50 text-zinc-600'}`}>
                           {selectedFile ? <FileText size={32} /> : <Upload size={32} />}
@@ -520,7 +520,7 @@ export default function UploadsPage() {
                 <button 
                   type="submit"
                   disabled={isUploading || !selectedFile}
-                  className="relative w-full overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-4 cursor-pointer shadow-xl shadow-blue-600/20 mt-8 ml-12! h-12!"
+                  className="relative mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-4 overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                 >
                   {isUploading ? (
                     <>

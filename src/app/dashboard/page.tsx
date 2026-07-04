@@ -10,9 +10,7 @@ import {
   Activity,
   Calendar,
   User,
-  Brain,
   Database,
-  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { REPORTS } from "@/lib/data";
@@ -28,142 +26,154 @@ export default function Dashboard() {
   if (!mounted) return null;
 
   return (
-    <div className="space-y-24 animate-fade-in pb-16">
-      {/* Header */}
-      <div
-        className="w-full space-y-3"
-        style={{ marginTop: "132px", marginBottom: "60px" }}
-      >
-        <div className="flex flex-col items-center gap-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-          <div className="hidden sm:block" />
-
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:justify-self-center">
-            Patient Dashboard
-          </h1>
-
-          <div className="hidden sm:flex sm:relative sm:right-4 sm:justify-self-end lg:right-6">
-            <Link href="/dashboard/reports/upload">
-              <button className="premium-button inline-flex h-10 min-w-[250px] items-center justify-center gap-2 whitespace-nowrap rounded-xl px-8 text-[13px] font-bold text-white shadow-lg shadow-blue-500/20 text-center">
-                <Plus size={16} />
-                Upload New Report
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        <p className="text-center text-zinc-500 text-lg font-medium">
-          Your medical data is encrypted and stored on IPFS.
-        </p>
-
-        <div className="flex justify-center sm:hidden">
-          <Link href="/dashboard/reports/upload">
-            <button className="premium-button inline-flex h-10 min-w-[220px] items-center justify-center gap-2 whitespace-nowrap rounded-xl px-8 text-[13px] font-bold text-white shadow-lg shadow-blue-500/20 text-center">
-              {/* <Plus size={15} /> */}
-              Upload New Report
-            </button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 ml-5!">
-        <StatsCard
-          title="Medical Reports"
-          value="12"
-          change="+2"
-          trend="up"
-          icon={<FileText className="text-blue-400" size={28} />}
-        />
-        <StatsCard
-          title="Active Consents"
-          value="3"
-          change="+1"
-          trend="up"
-          icon={<ShieldCheck className="text-emerald-400" size={28} />}
-        />
-        <StatsCard
-          title="Health Score"
-          value="94"
-          change="0"
-          trend="neutral"
-          icon={<Activity className="text-rose-400" size={28} />}
-        />
-        <StatsCard
-          title="Data Points"
-          value="1.2k"
-          change="+124"
-          trend="up"
-          icon={<Database className="text-purple-400" size={28} />}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-20 2xl:grid-cols-3  ml-5!">
-        {/* Recent Reports */}
-        <div
-          className="2xl:col-span-2 space-y-14 pt-10 lg:pt-16 2xl:pt-20"
-          style={{ marginTop: "60px" }}
-        >
-          <Link href="/dashboard/consent" className="block mt-6! w-sm mb-6!">
-              <button className="w-full h-12 rounded-2xl border border-white/5 bg-white/[0.02] text-sm font-bold text-zinc-400 hover:bg-white/[0.04] hover:text-white transition-all" style={{marginLeft: "380px"}}>
-                Manage Permissions
-              </button>
-            </Link>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 mb-8!">
-              <h2 className="text-2xl font-bold text-white">Recent Activity</h2>
-              <span className="bg-white/5 border border-white/10 text-zinc-500 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider">
-                Updates
-              </span>
+    <div className="animate-fade-in pb-16">
+      <div className="flex w-full flex-col gap-10">
+        {/* Header */}
+        <div className="w-full space-y-4 pt-10 sm:pt-12">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-3 text-left">
+              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                Patient Dashboard
+              </h1>
+              <p className="max-w-2xl text-lg font-medium text-zinc-500">
+                Your medical data is encrypted and stored on IPFS.
+              </p>
             </div>
-            <Link
-              href="/dashboard/reports"
-              className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-all flex items-center gap-1.5 px-5 py-10 rounded-lg bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10 mr-8!"
-            >
-              Browse All <ArrowUpRight size={14} />
-            </Link>
+
+            <div className="flex sm:justify-end">
+              <Link href="/dashboard/reports/upload">
+                <button className="premium-button inline-flex h-10 min-w-62.5 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-8 text-[13px] font-bold text-white shadow-lg shadow-blue-500/20 text-center">
+                  <Plus size={16} />
+                  Upload New Report
+                </button>
+              </Link>
+            </div>
           </div>
-          <div className="glass-card w-full max-w-[1160px] rounded-2xl border border-white/5 p-4 shadow-2xl shadow-black/50">
-            <div className="space-y-4">
-              {REPORTS.slice(0, 3).map((report) => (
-                <ReportItem
-                  key={report.id}
-                  title={report.title}
-                  date={report.date}
-                  provider={report.provider}
-                  status={report.status}
-                  cid={
-                    report.cid.length > 15
-                      ? report.cid.slice(0, 8) + "..." + report.cid.slice(-5)
-                      : report.cid
-                  }
+
+          <p className="text-left text-sm font-medium text-zinc-500 sm:text-base">
+            Your medical data is encrypted and stored on IPFS.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <StatsCard
+            title="Medical Reports"
+            value="12"
+            change="+2"
+            trend="up"
+            icon={<FileText className="text-blue-400" size={28} />}
+          />
+          <StatsCard
+            title="Active Consents"
+            value="3"
+            change="+1"
+            trend="up"
+            icon={<ShieldCheck className="text-emerald-400" size={28} />}
+          />
+          <StatsCard
+            title="Health Score"
+            value="94"
+            change="0"
+            trend="neutral"
+            icon={<Activity className="text-rose-400" size={28} />}
+          />
+          <StatsCard
+            title="Data Points"
+            value="1.2k"
+            change="+124"
+            trend="up"
+            icon={<Database className="text-purple-400" size={28} />}
+          />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex w-full flex-col gap-8">
+          <section className="space-y-5">
+            <SectionHeader
+              title="Recent Activity"
+              description="Most recent reports and analyses appear here."
+              action={
+                <Link
+                  href="/dashboard/reports"
+                  className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/3 px-5 py-2 text-xs font-bold text-blue-400 transition-all hover:border-white/10 hover:bg-white/6 hover:text-blue-300"
+                >
+                  Browse All <ArrowUpRight size={14} />
+                </Link>
+              }
+            />
+
+            <div className="glass-card w-full rounded-2xl border border-white/5 p-4 shadow-2xl shadow-black/50">
+              <div className="space-y-4">
+                {REPORTS.slice(0, 3).map((report) => (
+                  <ReportItem
+                    key={report.id}
+                    title={report.title}
+                    date={report.date}
+                    provider={report.provider}
+                    status={report.status}
+                    cid={
+                      report.cid.length > 15
+                        ? `${report.cid.slice(0, 8)}...${report.cid.slice(-5)}`
+                        : report.cid
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-5">
+            <SectionHeader
+              title="Access Requests"
+              description="Hospitals waiting for your approval or follow-up."
+              action={
+                <Link
+                  href="/dashboard/consent"
+                  className="inline-flex items-center justify-center rounded-xl border border-white/5 bg-white/2 px-4 py-2 text-sm font-bold text-zinc-400 transition-all hover:bg-white/4 hover:text-white"
+                >
+                  Manage Permissions
+                </Link>
+              }
+            />
+
+            <div className="glass-card w-full rounded-2xl border border-white/5 p-4 shadow-2xl shadow-black/50">
+              <div className="space-y-4">
+                <AccessRequestItem
+                  hospital="Apollo Hospitals"
+                  reason="Cardiac evaluation"
+                  time="2h"
                 />
-              ))}
+                <AccessRequestItem
+                  hospital="AIIMS New Delhi"
+                  reason="Neurology opinion"
+                  time="5h"
+                />
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Pending Consents */}
-        <div className="space-y-6 mt-20 mb-25!">
-          <h2 className="text-xl font-bold text-white flex items-center gap-5 pl-2">
-            Access Requests
-            {/* <span className="bg-orange-500/10 text-orange-400 text-[10px] px-2 py-0.5 rounded-full">2</span> */}
-          </h2>
-          <div className="glass-card w-full max-w-[1160px] rounded-2xl border border-white/5 p-4 shadow-2xl shadow-black/50 mt-8!">
-            <div className="space-y-4">
-              <AccessRequestItem
-                hospital="Apollo Hospitals"
-                reason="Cardiac evaluation"
-                time="2h"
-              />
-              <AccessRequestItem
-                hospital="AIIMS New Delhi"
-                reason="Neurology opinion"
-                time="5h"
-              />
-            </div>
-          </div>
+          </section>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SectionHeader({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="space-y-1 text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-white">{title}</h2>
+        <p className="text-sm font-medium text-zinc-500">{description}</p>
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
@@ -182,7 +192,7 @@ function StatsCard({
   icon: ReactNode;
 }) {
   return (
-    <div className="glass-card stat-card-glow relative h-full min-h-[150px] rounded-[24px] border border-white/5 p-5 group flex flex-col items-center justify-center gap-3 overflow-hidden text-center">
+    <div className="glass-card stat-card-glow relative h-full min-h-37.5 rounded-3xl border border-white/5 p-5 group flex flex-col items-center justify-center gap-3 overflow-hidden text-center">
       <div
         className={`absolute right-4 top-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider ${
           trend === "up"
@@ -196,7 +206,7 @@ function StatsCard({
         {trend === "down" && <ArrowDownRight size={12} />}
         {change}
       </div>
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.03] transition-all duration-500 group-hover:bg-blue-500/10 group-hover:scale-110">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/3 transition-all duration-500 group-hover:bg-blue-500/10 group-hover:scale-110">
         {icon}
       </div>
       <div className="flex flex-col items-center justify-center gap-1 text-center px-2">
@@ -225,9 +235,9 @@ function ReportItem({
   cid: string;
 }) {
   return (
-    <div className="flex min-h-[96px] items-center justify-between rounded-2xl border border-white/[0.03] bg-white/[0.01] px-10 py-6 hover:bg-white/[0.02] transition-all cursor-pointer group relative">
+    <div className="flex min-h-24 items-center justify-between rounded-2xl border border-white/3 bg-white/1 px-10 py-6 hover:bg-white/2 transition-all cursor-pointer group relative">
       <div className="flex items-center gap-6">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.02] text-zinc-500 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-all duration-500">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/2 text-zinc-500 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-all duration-500">
           <FileText size={22} />
         </div>
         <div className="space-y-2.5 pr-4">
@@ -258,7 +268,7 @@ function ReportItem({
         >
           {status}
         </span>
-        <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white/[0.02] border border-white/5 text-zinc-600 group-hover:text-blue-400 group-hover:border-blue-500/20 group-hover:bg-blue-500/5 transition-all">
+        <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white/2 border border-white/5 text-zinc-600 group-hover:text-blue-400 group-hover:border-blue-500/20 group-hover:bg-blue-500/5 transition-all">
           <ArrowUpRight size={18} />
         </div>
       </div>
@@ -276,9 +286,9 @@ function AccessRequestItem({
   time: string;
 }) {
   return (
-    <div className="flex min-h-[96px] items-center justify-between rounded-2xl border border-white/[0.03] bg-white/[0.01] px-8 py-6 hover:bg-white/[0.02] transition-all cursor-pointer group relative">
+    <div className="flex min-h-24 items-center justify-between rounded-2xl border border-white/3 bg-white/1 px-8 py-6 hover:bg-white/2 transition-all cursor-pointer group relative">
       <div className="flex items-center gap-5 pl-2">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.02] text-zinc-500 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-all duration-500">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/2 text-zinc-500 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-all duration-500">
           <ShieldCheck size={22} />
         </div>
         <div className="space-y-2 pr-6">

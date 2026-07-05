@@ -202,76 +202,78 @@ export default function UploadReportPage() {
   }
 
   return (
-    <div className="space-y-12 animate-fade-in pb-20 max-w-5xl mx-auto">
+    <div className="mx-auto flex w-full max-w-5xl flex-col space-y-12 pb-20 animate-fade-in">
       <div className="space-y-1.5">
         <h1 className="text-4xl font-bold tracking-tight text-white">Ingest Medical Data</h1>
         <p className="text-zinc-500 text-lg font-medium">Securely upload reports for OCR processing, MedGemma AI analysis, and IPFS anchoring.</p>
       </div>
 
       {stage === "idle" && (
-        <div
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          className={`group relative flex flex-col items-center justify-center gap-8 rounded-[48px] border-2 border-dashed p-32 text-center transition-all duration-500 ${
-            dragOver
-              ? "border-blue-500/60 bg-blue-500/[0.03] scale-[0.99]"
-              : "border-white/10 bg-white/[0.01] hover:border-blue-500/30 hover:bg-white/[0.02]"
-          }`}
-        >
-          <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-[80px] transition-opacity duration-700 pointer-events-none" />
-          
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-[32px] border border-blue-500/20 bg-blue-500/10 shadow-2xl shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
-            <UploadCloud size={40} className="text-blue-400" />
-          </div>
-          
-          <div className="relative space-y-2">
-            <p className="text-2xl font-bold text-white tracking-tight">Drop your clinical records here</p>
-            <p className="text-sm text-zinc-500 font-medium max-w-sm mx-auto">Supports PDF, JPG, PNG, and DICOM formats. All files are encrypted before processing.</p>
-          </div>
+        <div className="flex w-full justify-center">
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            className={`group relative flex w-full max-w-4xl flex-col items-center justify-center gap-8 rounded-[48px] border-2 border-dashed p-32 text-center transition-all duration-500 ${
+              dragOver
+                ? "border-blue-500/60 bg-blue-500/[0.03] scale-[0.99]"
+                : "border-white/10 bg-white/[0.01] hover:border-blue-500/30 hover:bg-white/[0.02]"
+            }`}
+          >
+            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-[80px] transition-opacity duration-700 pointer-events-none" />
+            
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-[32px] border border-blue-500/20 bg-blue-500/10 shadow-2xl shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+              <UploadCloud size={40} className="text-blue-400" />
+            </div>
+            
+            <div className="relative space-y-2">
+              <p className="text-2xl font-bold text-white tracking-tight">Drop your clinical records here</p>
+              <p className="text-sm text-zinc-500 font-medium max-w-sm mx-auto">Supports PDF, JPG, PNG, and DICOM formats. All files are encrypted before processing.</p>
+            </div>
 
-          <label className="relative cursor-pointer">
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.dcm"
-              className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
-            />
-            <span className="premium-button flex h-14 items-center gap-3 rounded-2xl px-10 text-sm font-bold text-white">
-              <Plus size={20} />
-              Select File
-            </span>
-          </label>
+            <label className="relative cursor-pointer">
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,.dcm"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+              />
+              <span className="premium-button flex h-14 items-center gap-3 rounded-2xl px-10 text-sm font-bold text-white">
+                <Plus size={20} />
+                Select File
+              </span>
+            </label>
+          </div>
         </div>
       )}
 
       {stage === "selected" && file && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-           <div className="flex flex-col items-center gap-8 rounded-[48px] border border-white/10 bg-white/[0.02] p-16 text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-500/10 border border-blue-500/10 text-blue-400">
-                <FileText size={40} />
-              </div>
-              <div className="space-y-2">
-                <p className="text-2xl font-bold text-white">{file.name}</p>
-                <p className="text-sm text-zinc-500">Ready for clinical intelligence analysis</p>
-              </div>
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => { setFile(null); setStage("idle"); }}
-                  className="flex h-14 items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-8 text-sm font-bold text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
-                >
-                  <X size={20} />
-                  Cancel
-                </button>
-                <button 
-                  onClick={runPipeline}
-                  className="premium-button flex h-14 items-center gap-3 rounded-2xl px-10 text-sm font-bold text-white shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
-                >
-                  <Zap size={20} />
-                  Upload & Analyze
-                </button>
-              </div>
-           </div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex w-full justify-center">
+          <div className="flex w-full max-w-4xl flex-col items-center gap-8 rounded-[48px] border border-white/10 bg-white/[0.02] p-16 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-500/10 border border-blue-500/10 text-blue-400">
+              <FileText size={40} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-white">{file.name}</p>
+              <p className="text-sm text-zinc-500">Ready for clinical intelligence analysis</p>
+            </div>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => { setFile(null); setStage("idle"); }}
+                className="flex h-14 items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-8 text-sm font-bold text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
+              >
+                <X size={20} />
+                Cancel
+              </button>
+              <button 
+                onClick={runPipeline}
+                className="premium-button flex h-14 items-center gap-3 rounded-2xl px-10 text-sm font-bold text-white shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
+              >
+                <Zap size={20} />
+                Upload & Analyze
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

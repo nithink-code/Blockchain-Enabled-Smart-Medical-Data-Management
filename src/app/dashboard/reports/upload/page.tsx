@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { saveRecentActivity } from "@/lib/recent-activity";
 import { 
   UploadCloud, 
   FileText, 
@@ -81,6 +82,31 @@ export default function UploadReportPage() {
   const [dragOver, setDragOver] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedStage = localStorage.getItem("upload_stage") as Stage;
+      const savedIdx = localStorage.getItem("upload_pipeline_idx");
+      const savedResult = localStorage.getItem("upload_analysis_result");
+
+      if (savedStage === "done" && savedResult) {
+        setStage("done");
+        setCurrentPipelineIdx(parseInt(savedIdx || "4", 10));
+        setAnalysisResult(JSON.parse(savedResult));
+      }
+    } catch (e) {
+      console.error("Error reading localStorage", e);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  if (!isHydrated) {
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>;
+  }
+
   const stageIndex = (s: Stage) => ["idle","selected","uploading","ocr","ai","xai","storing","done"].indexOf(s);
 
   function handleFile(f: File) {
@@ -108,6 +134,36 @@ export default function UploadReportPage() {
       if (!response.ok) throw new Error("Analysis failed");
 
       const data = await response.json();
+
+      // ── Persist result to localStorage so dashboard & reports page update ──
+      const prediction: string = data?.analysis?.prediction ?? "Unknown";
+      const malignantProb: number = data?.analysis?.probability?.malignant ?? 0;
+      const conditions: string[] = prediction === "Malignant"
+        ? ["Malignant Finding Detected"]
+        : [];
+      const extractedFields = data?.analysis?.extracted_data ?? {};
+      const fieldCount = Object.keys(extractedFields).length;
+
+      saveRecentActivity({
+        id: `${Date.now()}`,
+        title: file.name.replace(/\.[^.]+$/, "") || "Medical Report",
+        date: new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        provider: "Patient Upload",
+        status: "Analyzed",
+        type: file.name.endsWith(".pdf") ? "PDF Report" : "Image Scan",
+        cid: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+        aiSummary:
+          data?.extractedContent
+            ? data.extractedContent.substring(0, 240) + "..."
+            : `Prediction: ${prediction}. Malignant probability: ${(malignantProb * 100).toFixed(1)}%. ${fieldCount} clinical fields extracted.`,
+        conditions,
+        confidence: Math.round(Math.max(malignantProb, 1 - malignantProb) * 100),
+      });
+
       setAnalysisResult(data);
 
       // Transition through other UI stages
@@ -123,6 +179,11 @@ export default function UploadReportPage() {
       await delay(1000);
       setStage("done");
       setCurrentPipelineIdx(4);
+      
+      // Save everything to localStorage
+      localStorage.setItem("upload_stage", "done");
+      localStorage.setItem("upload_pipeline_idx", "4");
+      localStorage.setItem("upload_analysis_result", JSON.stringify(data));
     } catch (error) {
       console.error(error);
       setStage("idle");
@@ -414,6 +475,8 @@ export default function UploadReportPage() {
                       showlegend: false
                     }}
                     config={{ displayModeBar: false, responsive: true }}
+                    useResizeHandler={true}
+                    style={{ width: "100%", height: "100%" }}
                     className="w-full"
                   />
                 </div>
@@ -476,6 +539,8 @@ export default function UploadReportPage() {
                       showlegend: false
                     }}
                     config={{ displayModeBar: false, responsive: true }}
+                    useResizeHandler={true}
+                    style={{ width: "100%", height: "100%" }}
                     className="w-full"
                   />
                 </div>
@@ -556,6 +621,8 @@ export default function UploadReportPage() {
                       font: { family: 'inherit', color: '#fff' }
                     }}
                     config={{ displayModeBar: false, responsive: true }}
+                    useResizeHandler={true}
+                    style={{ width: "100%", height: "100%" }}
                     className="w-full"
                   />
                 </div>
@@ -565,7 +632,15 @@ export default function UploadReportPage() {
 
           <div className="flex items-center justify-center gap-6 pt-8">
             <button
-              onClick={() => { setStage("idle"); setFile(null); setCurrentPipelineIdx(-1); }}
+              onClick={() => { 
+                setStage("idle"); 
+                setFile(null); 
+                setCurrentPipelineIdx(-1); 
+                setAnalysisResult(null);
+                localStorage.removeItem("upload_stage");
+                localStorage.removeItem("upload_pipeline_idx");
+                localStorage.removeItem("upload_analysis_result");
+              }}
               className="flex h-14 items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-8 text-sm font-bold text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
             >
               <UploadCloud size={18} />

@@ -14,8 +14,8 @@ export default async function Home() {
 
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-blue-500/30">
-      {/* Fixed video background */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {/* Fixed video background — z-[-1] sits behind navbar (z-50) and all content */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#050505]">
         <video
           className="h-full w-full object-cover opacity-60"
           autoPlay
@@ -26,9 +26,11 @@ export default async function Home() {
         >
           <source src="/Cinematic_Dark_Themed_Web_App_Background.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-linear-to-b from-black/35 via-black/55 to-black/75" />
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/55 to-black/80" />
+        {/* Ambient glow accents */}
         <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-blue-500/20 blur-[130px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-pink-500/18 blur-[130px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-pink-500/15 blur-[130px]" />
       </div>
 
       <main className="relative z-10">

@@ -1,10 +1,7 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type Role = "patient" | "doctor" | null;
+import { useUserRole } from "@/lib/use-user-role";
 
 /**
  * Smart Dashboard link for the main navbar.
@@ -13,30 +10,8 @@ type Role = "patient" | "doctor" | null;
  * - Signed in as doctor  → /hospital
  */
 export function DashboardNavLink() {
-  const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
-  const [role, setRole] = useState<Role>(null);
-  const [fetching, setFetching] = useState(false);
-
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
-    setFetching(true);
-    // Sync user to MongoDB first (creates doc with role=patient if new user)
-    fetch("/api/user/sync", { method: "POST" })
-      .then((r) => r.json())
-      .then((data) => {
-        setRole(data.role ?? "patient");
-        setFetching(false);
-      })
-      .catch(() => {
-        // Fallback: try GET if POST failed
-        fetch("/api/user/me")
-          .then((r) => r.json())
-          .then((data) => setRole(data.role ?? "patient"))
-          .catch(() => setRole("patient"))
-          .finally(() => setFetching(false));
-      });
-  }, [isLoaded, isSignedIn]);
+  const { isSignedIn, role, roleKnown, isCheckingRole } = useUserRole();
 
   const handleClick = () => {
     window.dispatchEvent(new Event("page-navigation-started"));
@@ -44,13 +19,19 @@ export function DashboardNavLink() {
       router.push("/sign-in");
       return;
     }
+
+    if (isCheckingRole || !roleKnown) {
+      return;
+    }
+
     router.push(role === "doctor" ? "/hospital" : "/dashboard");
   };
 
   return (
     <button
       onClick={handleClick}
-      className="flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors hover:text-white focus:outline-none cursor-pointer"
+      disabled={isCheckingRole || !roleKnown}
+      className="flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors hover:text-white focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
       title={
         !isSignedIn
           ? "Sign in to access your dashboard"

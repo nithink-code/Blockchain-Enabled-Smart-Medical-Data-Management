@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, LogOut, Shield, Stethoscope } from "lucide-react";
+import { useUserRole } from "@/lib/use-user-role";
 
 export default function HospitalLayout({
   children,
@@ -12,21 +13,34 @@ export default function HospitalLayout({
   const router = useRouter();
   const [doctorName, setDoctorName] = useState("Doctor");
   const [loading, setLoading] = useState(true);
+  const { isLoaded, isSignedIn, role, roleKnown, isCheckingRole } = useUserRole();
 
   useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.replace("/sign-in");
+      return;
+    }
+
+    if (!roleKnown || isCheckingRole) return;
+
+    if (role !== "doctor") {
+      router.replace("/dashboard");
+      return;
+    }
+
     fetch("/api/user/me")
       .then((r) => r.json())
       .then((data) => {
-        if (data.role !== "doctor") {
-          router.replace("/dashboard");
-          return;
-        }
-
         setDoctorName(data.name || "Doctor");
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, [router]);
+      .catch(() => {
+        setDoctorName("Doctor");
+        setLoading(false);
+      });
+  }, [isLoaded, isSignedIn, role, roleKnown, isCheckingRole, router]);
 
   function handleSignOut() {
     window.location.href = "/sign-in";

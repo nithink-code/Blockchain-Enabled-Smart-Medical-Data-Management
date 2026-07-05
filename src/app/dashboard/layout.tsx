@@ -20,6 +20,7 @@ import {
   Upload
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useUserRole } from "@/lib/use-user-role";
 
 export default function DashboardLayout({
   children,
@@ -29,67 +30,27 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router   = useRouter();
   const [mounted, setMounted]       = useState(false);
-  const [roleChecked, setRoleChecked] = useState(false);
+  const { isLoaded, isSignedIn, role, roleKnown, isCheckingRole } = useUserRole();
 
   useEffect(() => {
-    setMounted(true);
+    const timer = window.setTimeout(() => {
+      setMounted(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   // ── Role guard & User Sync ────────────────────────────────────────────────
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !isLoaded || !isSignedIn) return;
+    if (!roleKnown || isCheckingRole) return;
 
-    const checkAndSyncUser = async () => {
-      // Add a timeout to prevent hanging on slow database connections
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+    if (role === "doctor") {
+      router.replace("/hospital");
+    }
+  }, [mounted, isLoaded, isSignedIn, roleKnown, isCheckingRole, role, router]);
 
-      try {
-        console.log("Dashboard Layout: Starting user sync...");
-        const syncRes = await fetch("/api/user/sync", { 
-          method: "POST",
-          signal: controller.signal 
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!syncRes.ok) {
-          throw new Error(`Sync failed with status: ${syncRes.status}`);
-        }
-
-        const syncData = await syncRes.json();
-        console.log("Dashboard Layout: Sync complete", syncData);
-        
-        if (syncData.role === "doctor") {
-          router.replace("/hospital");
-        } else {
-          setRoleChecked(true);
-        }
-      } catch (error: any) {
-        clearTimeout(timeoutId);
-        console.error("Dashboard Layout: Sync/Role check failed:", error);
-        
-        // Fallback: try to just get role if sync fails
-        try {
-          const meRes = await fetch("/api/user/me");
-          if (meRes.ok) {
-            const meData = await meRes.json();
-            if (meData.role === "doctor") {
-              router.replace("/hospital");
-              return;
-            }
-          }
-        } catch (innerError) {
-          console.error("Dashboard Layout: Fallback check failed too", innerError);
-        }
-        
-        // Always allow through as patient if checks fail to avoid black screen
-        setRoleChecked(true);
-      }
-    };
-
-    checkAndSyncUser();
-  }, [mounted, router]);
+  const roleResolved = !isSignedIn || (roleKnown && !isCheckingRole);
 
 
   if (!mounted) {
@@ -103,7 +64,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen pt-52 md:pt-60 lg:pt-64 bg-[#050505] text-white selection:bg-blue-500/30 font-sans transition-all duration-300">
       {/* Sync Status Indicator (Optional, subtle) */}
-      {!roleChecked && (
+      {!roleResolved && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-zinc-900/80 px-4 py-2 text-[10px] font-bold text-zinc-500 backdrop-blur-md border border-white/5 shadow-2xl">
           <Loader2 size={12} className="animate-spin text-blue-500" />
           Synchronizing Security Keys...

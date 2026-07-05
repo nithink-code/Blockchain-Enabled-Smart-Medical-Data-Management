@@ -2,65 +2,17 @@
 
 import Link from "next/link";
 import { ArrowRight, Stethoscope, User } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
-
-type Role = "patient" | "doctor" | null;
+import { useUserRole } from "@/lib/use-user-role";
 
 export function HomeCta() {
-  const { isLoaded, isSignedIn } = useAuth();
-  const [role, setRole] = useState<Role>(null);
-  const [loadingRole, setLoadingRole] = useState(false);
-
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) {
-      setRole(null);
-      setLoadingRole(false);
-      return;
-    }
-
-    let cancelled = false;
-    setLoadingRole(true);
-
-    const syncRole = async () => {
-      try {
-        const syncRes = await fetch("/api/user/sync", { method: "POST" });
-        if (syncRes.ok) {
-          const syncData = await syncRes.json();
-          if (!cancelled) {
-            setRole(syncData.role ?? "patient");
-            setLoadingRole(false);
-          }
-          return;
-        }
-
-        const meRes = await fetch("/api/user/me");
-        if (meRes.ok) {
-          const meData = await meRes.json();
-          if (!cancelled) setRole(meData.role ?? "patient");
-        } else if (!cancelled) {
-          setRole("patient");
-        }
-      } catch {
-        if (!cancelled) setRole("patient");
-      } finally {
-        if (!cancelled) setLoadingRole(false);
-      }
-    };
-
-    syncRole();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoaded, isSignedIn]);
+  const { isLoaded, isSignedIn, role, roleKnown, isCheckingRole } = useUserRole();
 
   if (!isLoaded) {
     return null;
   }
 
   if (isSignedIn) {
-    if (loadingRole || !role) {
+    if (isCheckingRole || !roleKnown || !role) {
       return null;
     }
 

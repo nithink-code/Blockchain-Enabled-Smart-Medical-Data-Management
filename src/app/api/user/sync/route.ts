@@ -3,7 +3,8 @@ import { auth, currentUser, createClerkClient } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/lib/models/User";
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+const clerkClient = clerkSecretKey ? createClerkClient({ secretKey: clerkSecretKey }) : null;
 
 /**
  * POST /api/user/sync
@@ -18,20 +19,37 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    await connectDB();
+
     let clerkUser = await currentUser();
     
     // Fallback to clerkClient if currentUser() is null (common in some environments)
-    if (!clerkUser) {
+    if (!clerkUser && clerkClient) {
       console.log("Sync API: currentUser() was null, trying clerkClient...");
       clerkUser = await clerkClient.users.getUser(userId);
     }
 
-    if (!clerkUser) {
-      console.error("Sync API: Could not fetch Clerk user for ID:", userId);
-      return NextResponse.json({ error: "Could not fetch Clerk user" }, { status: 500 });
+    const existingUser = await User.findOne({ clerkId: userId });
+    if (!clerkUser && existingUser) {
+      return NextResponse.json({
+        role: existingUser.role,
+        email: existingUser.email,
+        name: existingUser.name,
+        success: true,
+      });
     }
 
-    await connectDB();
+    if (!clerkUser) {
+      console.error("Sync API: Could not fetch Clerk user for ID:", userId);
+      return NextResponse.json(
+        {
+          error: "Could not fetch Clerk user",
+          success: false,
+          role: existingUser?.role ?? "patient",
+        },
+        { status: 503 }
+      );
+    }
 
     const email = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
     const name  = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
@@ -45,7 +63,7 @@ export async function POST() {
         $setOnInsert: { role: "patient" }, // default role only on first creation
         $set: { email, name },
       },
-      { upsert: true, returnDocument: 'after', runValidators: true }
+      { upsert: true, new: true, runValidators: true }
     );
 
     console.log("User synced successfully:", user.clerkId);
@@ -55,11 +73,12 @@ export async function POST() {
       name: user.name,
       success: true 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const details = error instanceof Error ? error.message : "Unknown error";
     console.error("Critical error in Sync API:", error);
     return NextResponse.json({ 
       error: "Internal Server Error", 
-      details: error.message,
+      details,
       success: false 
     }, { status: 500 });
   }

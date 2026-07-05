@@ -531,9 +531,9 @@ export default function UploadsPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleUpload} className="space-y-6 max-w-lg mx-auto w-full">
-                <div className="space-y-4 ml-20! mt-4!">
-                  <div className="space-y-3 mb-4!">
+              <form onSubmit={handleUpload} className="mx-auto w-full max-w-lg space-y-6">
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-3">
                     <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Full Name</label>
                     <input 
                       type="text"
@@ -546,7 +546,7 @@ export default function UploadsPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-3 mb-4!">
+                    <div className="space-y-3">
                       <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Age</label>
                       <input 
                         type="number"
@@ -559,7 +559,7 @@ export default function UploadsPage() {
                     </div>
                     <div className="space-y-3">
                       <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Gender</label>
-                      <div className="relative mb-4!">
+                      <div className="relative">
                         <select 
                           value={formData.gender}
                           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
@@ -576,9 +576,9 @@ export default function UploadsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-4">
+                    <div className="space-y-4 pt-4">
                     <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Medical Report (PDF Only)</label>
-                    <div className="relative mb-4!">
+                    <div className="relative">
                       <input 
                         type="file"
                         accept={allowedFileTypes.join(",")}
@@ -589,7 +589,7 @@ export default function UploadsPage() {
                       />
                       <label 
                         htmlFor="file-upload"
-                        className={`flex w-full mt-5! cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
+                        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
                       >
                         <div className={`rounded-full p-4 transition-colors ${selectedFile ? 'bg-blue-500/10 text-blue-400' : 'bg-zinc-900/50 text-zinc-600'}`}>
                           {selectedFile ? <FileText size={32} /> : <Upload size={32} />}
@@ -608,7 +608,7 @@ export default function UploadsPage() {
                 <button 
                   type="submit"
                   disabled={isUploading || !selectedFile}
-                  className="relative w-full overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-4 cursor-pointer shadow-xl shadow-blue-600/20 mt-8 ml-12! h-12!"
+                  className="relative mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-4 overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                 >
                   {isUploading ? (
                     <>

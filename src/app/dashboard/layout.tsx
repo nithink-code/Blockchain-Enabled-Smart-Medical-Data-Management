@@ -101,7 +101,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen pt-52 md:pt-60 lg:pt-64 bg-[#050505] text-white selection:bg-blue-500/30 font-sans transition-all duration-300">
+    <div className="min-h-screen pt-20 bg-[#050505] text-white selection:bg-blue-500/30 font-sans transition-all duration-300">
       {/* Sync Status Indicator (Optional, subtle) */}
       {!roleChecked && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-zinc-900/80 px-4 py-2 text-[10px] font-bold text-zinc-500 backdrop-blur-md border border-white/5 shadow-2xl">
@@ -110,17 +110,12 @@ export default function DashboardLayout({
         </div>
       )}
 
-      {/* Main Content Area - Now full width */}
-      <div 
-        className="flex min-w-0 flex-1 flex-col relative z-10"
-      >
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 lg:px-16 scroll-smooth">
-          <div className="w-full max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
-      </div>
+      {/* Page Content */}
+      <main className="w-full overflow-y-auto scroll-smooth">
+        <div className="app-shell py-10">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
@@ -142,11 +137,11 @@ function SidebarLink({
     <Link 
       href={href} 
       className={`flex items-center gap-3 rounded-2xl text-[13px] font-semibold transition-all duration-300 group relative ${
-        collapsed ? "justify-center h-12 w-12 mx-auto p-0" : "min-h-[48px] px-3 py-2.5 w-[236px] mx-auto justify-start text-left"
+        collapsed ? "justify-center h-12 w-12 mx-auto p-0" : "min-h-12 px-3 py-2.5 w-59 mx-auto justify-start text-left"
       } ${
         active 
           ? "bg-blue-500/12 text-white border border-blue-500/25 shadow-[0_10px_24px_-16px_rgba(59,130,246,0.55)]" 
-          : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100 border border-white/0 hover:border-white/10"
+          : "text-zinc-400 hover:bg-white/4 hover:text-zinc-100 border border-white/0 hover:border-white/10"
       }`}
     >
       <span className={`shrink-0 transition-all duration-500 ${active ? "text-blue-400 scale-110" : "group-hover:text-zinc-300 group-hover:scale-110"}`}>
@@ -160,7 +155,7 @@ function SidebarLink({
       
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-24 px-4 py-2.5 bg-zinc-900 border border-white/10 rounded-xl text-white text-sm font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 translate-x-[-10px] group-hover:translate-x-0 z-50 shadow-2xl">
+        <div className="absolute left-24 px-4 py-2.5 bg-zinc-900 border border-white/10 rounded-xl text-white text-sm font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 -translate-x-2.5 group-hover:translate-x-0 z-50 shadow-2xl">
           {label}
           <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-zinc-900 border-l border-b border-white/10 rotate-45" />
         </div>

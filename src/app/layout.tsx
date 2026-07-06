@@ -5,6 +5,8 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { PageLoader } from "@/components/page-loader";
+import { ToastContainer } from "@/components/toast";
+import { AuthToastWatcher } from "@/components/auth-toast-watcher";
 import { Suspense } from "react";
 
 
@@ -32,6 +34,8 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <PageLoader />
           </Suspense>
+          <AuthToastWatcher />
+          <ToastContainer />
           <Navbar />
           {children}
           <Footer />

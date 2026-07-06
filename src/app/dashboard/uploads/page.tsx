@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, FileText, CheckCircle2, Clock, Trash2, ExternalLink, X, Loader, Activity, User, Info } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Clock, Trash2, X, Loader, Activity, User, Info, ChevronDown } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { saveRecentActivity } from "@/lib/recent-activity";
@@ -286,6 +286,7 @@ export default function UploadsPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ name: '', age: '', gender: 'Male' });
+  const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -392,10 +393,10 @@ export default function UploadsPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col justify-start space-y-14 px-6 pb-20 pt-28 animate-in fade-in slide-in-from-bottom-4 duration-700 sm:pt-32 lg:px-8 lg:pt-36">
-      <div className="mx-auto flex max-w-4xl flex-col items-center text-center pt-2 sm:pt-4 mt-30! ml-40!">
-        <div className="space-y-4 mb-10!">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl mb-5!">
+    <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col items-center gap-14 px-6 pb-20 pt-14! animate-in fade-in slide-in-from-bottom-4 duration-700 sm:pt-16! lg:px-8 lg:pt-40!">
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center text-center pt-4! sm:pt-6!">
+        <div className="mb-12 space-y-6!">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             My <span className="text-blue-500">Uploads</span>
           </h1>
           <p className="mx-auto max-w-3xl text-lg font-medium text-zinc-500 sm:text-xl">
@@ -403,7 +404,7 @@ export default function UploadsPage() {
           </p>
         </div>
 
-        <div className="mt-10 flex justify-center mb-10!">
+        <div className="mt-8! flex justify-center">
           <button
             onClick={() => setShowModal(true)}
             className="group relative flex h-[60px] w-[220px] items-center justify-center gap-3 overflow-hidden rounded-full bg-blue-600 px-10 py-7 text-sm font-bold text-white shadow-2xl shadow-blue-500/30 transition-all hover:scale-[1.05] hover:bg-blue-500 active:scale-95 cursor-pointer"
@@ -415,65 +416,95 @@ export default function UploadsPage() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-10 px-4 sm:px-6 lg:px-10 ml-15! mr-15!">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl">
-          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-12 px-4 sm:px-6 lg:px-10">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 shadow-2xl backdrop-blur-xl"
+          style={{ padding: "1.5rem" }}
+        >
+          <div
+            className="flex items-center justify-center gap-4 border-b border-white/5 text-center"
+            style={{ minHeight: "48px", marginBottom: "1rem", paddingBottom: "0.75rem" }}
+          >
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">Extracted Data</h3>
           </div>
 
           {analysisResult ? (
-            <div className="space-y-4">
-              {Object.entries(analysisResult.extracted_data).map(([key, value]: [string, any]) => (
-                <div key={key} className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-5 py-4.5">
-                  <span className="font-medium text-zinc-400">{key}</span>
-                  <span className="font-bold text-white">
-                    {typeof value === "number" ? value.toFixed(2).replace(/\.00$/, "") : value}
-                  </span>
-                </div>
-              ))}
-              <div className="mt-7 border-t border-white/5 pt-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-zinc-400">Prediction</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${analysisResult.prediction === 'Malignant' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+            <div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {Object.entries(analysisResult.extracted_data).map(([key, value]: [string, any]) => (
+                  <div
+                    key={key}
+                    className="flex min-h-[44px] flex-col items-center justify-center gap-1 border border-white/10 bg-[#0A0A0A]/80 text-center sm:flex-row sm:justify-between sm:text-left"
+                    style={{ paddingLeft: "2rem", paddingRight: "2rem", paddingTop: "0.5rem", paddingBottom: "0.5rem" }}
+                  >
+                    <span className="font-medium text-zinc-400 leading-relaxed">{key}</span>
+                    <span className="font-semibold text-white leading-relaxed">
+                      {typeof value === "number" ? value.toFixed(2).replace(/\.00$/, "") : value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div
+                className="border-t border-white/5"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                  paddingLeft: "2rem",
+                  paddingRight: "2rem",
+                  paddingTop: "0.875rem",
+                  marginTop: "0.875rem",
+                }}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-medium text-zinc-400 leading-relaxed">Prediction</span>
+                  <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${analysisResult.prediction === 'Malignant' ? 'bg-red-500/20 text-red-400' : 'text-emerald-400'}`}>
                     {analysisResult.prediction}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-zinc-400">Confidence</span>
-                  <span className="font-bold text-blue-400">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-medium text-zinc-400 leading-relaxed">Confidence</span>
+                  <span className="shrink-0 font-bold text-blue-400">
                     {(Math.max(analysisResult.probability.benign, analysisResult.probability.malignant) * 100).toFixed(1)}%
                   </span>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="py-20 text-center">
-              <Info className="mx-auto mb-4 text-zinc-700" size={48} />
-              <p className="font-medium text-zinc-500">
+            <div className="flex flex-col items-center justify-center text-center" style={{ minHeight: "140px" }}>
+              <Info className="mx-auto mb-5 text-zinc-700" size={48} />
+              <p className="max-w-sm font-medium leading-relaxed text-zinc-500">
                 No analysis data yet.<br />Upload a report to see details.
               </p>
             </div>
           )}
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl min-h-[520px]">
-          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 shadow-2xl backdrop-blur-xl"
+          style={{ minHeight: "460px", padding: "1.75rem" }}
+        >
+          <div
+            className="flex items-center justify-center gap-4 border-b border-white/5 text-center"
+            style={{ minHeight: "60px", marginBottom: "1.5rem", paddingBottom: "1rem" }}
+          >
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">LIME Local Impact (Waterfall Plot)</h3>
           </div>
 
-          <div className="flex h-[380px] w-full items-center justify-center">
+          <div className="w-full" style={{ height: "320px" }}>
             {analysisResult ? (
               <Plot
                 data={limeFigure?.data ?? []}
                 layout={limeFigure?.layout as any}
                 config={{ responsive: true, displayModeBar: false }}
-                className="h-full w-full"
+                useResizeHandler
+                style={{ width: "100%", height: "100%" }}
               />
             ) : (
-              <div className="w-full text-center">
-                <p className="text-sm font-medium italic text-zinc-600">
+              <div className="flex h-full w-full items-center justify-center text-center">
+                <p className="text-sm font-medium italic leading-relaxed text-zinc-600">
                   Upload a report to generate the LIME waterfall plot.
                 </p>
               </div>
@@ -481,23 +512,30 @@ export default function UploadsPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 p-8 shadow-2xl backdrop-blur-xl min-h-[520px]">
-          <div className="mb-7 flex items-center justify-center gap-3 border-b border-white/5 pb-5 text-center">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 shadow-2xl backdrop-blur-xl"
+          style={{ minHeight: "460px", padding: "1.75rem" }}
+        >
+          <div
+            className="flex items-center justify-center gap-4 border-b border-white/5 text-center"
+            style={{ minHeight: "60px", marginBottom: "1.5rem", paddingBottom: "1rem" }}
+          >
             <Activity className="text-blue-500" size={24} />
             <h3 className="text-xl font-bold text-white">SHAP Global Attribution</h3>
           </div>
 
-          <div className="flex h-[380px] w-full items-center justify-center">
+          <div className="w-full" style={{ height: "320px" }}>
             {analysisResult?.explanation?.shap_global_contribution ? (
               <Plot
                 data={shapFigure?.data ?? []}
                 layout={shapFigure?.layout as any}
                 config={{ responsive: true, displayModeBar: false }}
-                className="h-full w-full"
+                useResizeHandler
+                style={{ width: "100%", height: "100%" }}
               />
             ) : (
-              <div className="w-full text-center">
-                <p className="text-sm font-medium italic text-zinc-600">
+              <div className="flex h-full w-full items-center justify-center text-center">
+                <p className="text-sm font-medium italic leading-relaxed text-zinc-600">
                   Upload a report to generate the SHAP summary plot.
                 </p>
               </div>
@@ -516,70 +554,71 @@ export default function UploadsPage() {
           <div className="relative w-full max-w-2xl overflow-hidden rounded-[40px] border border-white/5 bg-[#0A0A0A] shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none" />
             
-            <div className="relative p-8 md:px-16 flex flex-col justify-center" style={{ height: "450px" }}>
-              <div className="flex items-start justify-between mb-6 text-center">
-                <div className="w-full">
-                  <h2 className="text-3xl font-bold text-white tracking-tight">Upload Document</h2>
-                  <p className="text-zinc-500 text-sm mt-1">Provide patient details and upload the medical report.</p>
-                </div>
-                <button 
+            <div className="relative flex min-h-[520px] flex-col items-center justify-center gap-8 px-8 py-10 text-center md:px-16 md:py-12">
+              <div className="relative w-full max-w-xl space-y-3 pb-3 pt-3 text-center">
+                <h2 className="text-3xl font-bold tracking-tight text-white">Upload Document</h2>
+                <p className="text-sm text-zinc-500">Provide patient details and upload the medical report.</p>
+                <button
                   onClick={() => setShowModal(false)}
                   disabled={isUploading}
-                  className="absolute right-8 top-8 rounded-full p-2 text-zinc-600 hover:bg-white/5 hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                  className="absolute right-0 top-0 rounded-full p-2 text-zinc-600 transition-all hover:text-white cursor-pointer disabled:opacity-50"
                 >
                   <X size={24} />
                 </button>
               </div>
 
-              <form onSubmit={handleUpload} className="mx-auto w-full max-w-lg space-y-6">
-                <div className="space-y-4 pt-4">
-                  <div className="space-y-3">
-                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Full Name</label>
-                    <input 
+              <form onSubmit={handleUpload} className="flex w-full max-w-xl flex-col items-stretch gap-7">
+                <div className="flex w-full flex-col gap-6">
+                  <div className="flex flex-col items-start gap-2 text-left">
+                    <label className="block text-left text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500">Full Name</label>
+                    <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. John Doe"
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all text-lg"
+                      className="h-10 w-full rounded-lg border border-white/10 bg-white/[0.02] px-5 text-left text-base text-white placeholder:text-zinc-700 [text-indent:4px] transition-all duration-200 ease-out focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Age</label>
-                      <input 
-                        type="number"
+                  <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="flex flex-col items-start gap-2 text-left">
+                      <label className="block text-left text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500">Age</label>
+                      <input
+                        type="text" inputMode="numeric" pattern="[0-9]*"
                         required
                         value={formData.age}
                         onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                         placeholder="Age"
-                        className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all text-lg"
+                        className="h-10 w-full rounded-lg border border-white/10 bg-white/[0.02] px-5 text-left text-base text-white placeholder:text-zinc-700 [text-indent:4px] transition-all duration-200 ease-out focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none"
                       />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Gender</label>
-                      <div className="relative">
-                        <select 
+                    <div className="flex flex-col items-start gap-2 text-left">
+                      <label className="block text-left text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500">Gender</label>
+                      <div className="group relative w-full">
+                        <select
                           value={formData.gender}
-                          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all appearance-none cursor-pointer text-lg"
+                          onChange={(e) => {
+                            setFormData({ ...formData, gender: e.target.value });
+                            setIsGenderDropdownOpen(false);
+                          }}
+                          onClick={() => setIsGenderDropdownOpen((prev) => !prev)}
+                          onBlur={() => setIsGenderDropdownOpen(false)}
+                          className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-white/10 bg-white/[0.02] pl-10 pr-12 indent-1 text-left text-base text-white transition-all duration-200 ease-out focus:border-white/10 focus:bg-white/[0.05] focus:outline-none"
                         >
                           <option value="Male" className="bg-[#0A0A0A]">Male</option>
                           <option value="Female" className="bg-[#0A0A0A]">Female</option>
                           <option value="Other" className="bg-[#0A0A0A]">Other</option>
                         </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-zinc-600">
-                          <ExternalLink size={16} className="rotate-90" />
-                        </div>
+                        <ChevronDown className={`pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 transition-transform duration-200 ease-out ${isGenderDropdownOpen ? 'rotate-180 text-blue-400' : 'rotate-0'}`} />
                       </div>
                     </div>
                   </div>
 
-                    <div className="space-y-4 pt-4">
-                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Medical Report (PDF Only)</label>
-                    <div className="relative">
-                      <input 
+                  <div className="flex flex-col items-start gap-2 pt-3 text-left">
+                    <label className="block text-left text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500">Medical Report (PDF Only)</label>
+                    <div className="relative w-full">
+                      <input
                         type="file"
                         accept={allowedFileTypes.join(",")}
                         required
@@ -587,28 +626,28 @@ export default function UploadsPage() {
                         className="hidden"
                         id="file-upload"
                       />
-                      <label 
+                      <label
                         htmlFor="file-upload"
-                        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
+                        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-5 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 text-center transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
                       >
                         <div className={`rounded-full p-4 transition-colors ${selectedFile ? 'bg-blue-500/10 text-blue-400' : 'bg-zinc-900/50 text-zinc-600'}`}>
                           {selectedFile ? <FileText size={32} /> : <Upload size={32} />}
                         </div>
-                        <div className="text-center">
+                        <div className="mx-auto flex max-w-sm flex-col items-center gap-2 text-center">
                           <p className={`text-base font-medium ${selectedFile ? 'text-blue-400' : 'text-zinc-400'}`}>
                             {selectedFile ? selectedFile.name : 'Choose a file or drag here'}
                           </p>
-                          {!selectedFile && <p className="text-sm text-zinc-600 mt-2">PDF documents only, max 10MB</p>}
+                          {!selectedFile && <p className="text-sm text-zinc-600">PDF documents only, max 10MB</p>}
                         </div>
                       </label>
                     </div>
                   </div>
                 </div>
 
-                <button 
+                <button
                   type="submit"
                   disabled={isUploading || !selectedFile}
-                  className="relative mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-4 overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                  className="relative mt-4 flex h-14 w-full cursor-pointer items-center justify-center gap-4 overflow-hidden rounded-xl bg-blue-600 py-6 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                 >
                   {isUploading ? (
                     <>
@@ -624,7 +663,7 @@ export default function UploadsPage() {
                 </button>
               </form>
             </div>
-          </div>
+            </div>
         </div>
       )}
 

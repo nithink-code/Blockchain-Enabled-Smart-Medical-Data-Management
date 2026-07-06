@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   UploadCloud,
@@ -7,10 +11,11 @@ import {
   ShieldPlus
 } from "lucide-react";
 import { HomeCta } from "./home-cta";
+import { useUserRole } from "@/lib/use-user-role";
 
-export default async function Home() {
-  // We remove the auto-redirect to allow users to view the landing page even if logged in.
-  // The Navbar will handle showing the appropriate 'Dashboard' link instead.
+export default function Home() {
+  const { role } = useUserRole();
+  const isPatient = role === "patient";
 
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-blue-500/30">
@@ -66,35 +71,45 @@ export default async function Home() {
 
                 <div className="mx-auto grid w-full max-w-5xl gap-6 px-4 sm:grid-cols-2">
                   <LandingFeatureCard
+                    href="/dashboard"
                     icon={<LayoutDashboard className="h-6 w-6" />}
                     title="Patient Dashboard"
                     description="View reports, activity, health score, and key insights in one place."
                   />
                   <LandingFeatureCard
+                    href="/dashboard/uploads"
                     icon={<UploadCloud className="h-6 w-6" />}
                     title="Upload Documents"
                     description="Add new medical files securely with a guided upload flow."
                   />
+                  {!isPatient && (
+                    <LandingFeatureCard
+                      href="/workflow"
+                      icon={<ScanText className="h-6 w-6" />}
+                      title="OCR Processing"
+                      description="Extract readable data from report scans and turn them into structured records."
+                    />
+                  )}
                   <LandingFeatureCard
-                    icon={<ScanText className="h-6 w-6" />}
-                    title="OCR Processing"
-                    description="Extract readable data from report scans and turn them into structured records."
-                  />
-                  <LandingFeatureCard
+                    href="/dashboard/reports"
                     icon={<FileCheck2 className="h-6 w-6" />}
                     title="Report Review"
                     description="Track document status, analysis results, and verified record details."
                   />
                   <LandingFeatureCard
+                    href="/dashboard/consent"
                     icon={<ShieldPlus className="h-6 w-6" />}
                     title="Consent Control"
                     description="Manage access permissions with a simple and transparent approval flow."
                   />
-                  <LandingFeatureCard
-                    icon={<Users className="h-6 w-6" />}
-                    title="Hospital Access"
-                    description="Coordinate sharing with medical teams while keeping an audit trail."
-                  />
+                  {!isPatient && (
+                    <LandingFeatureCard
+                      href="/hospital"
+                      icon={<Users className="h-6 w-6" />}
+                      title="Hospital Access"
+                      description="Coordinate sharing with medical teams while keeping an audit trail."
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -105,14 +120,27 @@ export default async function Home() {
   );
 }
 
-function LandingFeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function LandingFeatureCard({
+  href,
+  icon,
+  title,
+  description,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="group min-h-[176px] w-full rounded-[1.75rem] border border-white/10 bg-black/40 p-6 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/20 hover:bg-white/[0.05] sm:p-7">
-      <div className="flex h-full items-center gap-5">
+    <Link
+      href={href}
+      className="group block min-h-[176px] w-full cursor-pointer rounded-[1.75rem] border border-white/10 bg-black/40 p-6 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/20 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 sm:p-7"
+    >
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400 transition-colors group-hover:bg-blue-500/15">
           {icon}
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
             {title}
           </h3>
@@ -121,6 +149,7 @@ function LandingFeatureCard({ icon, title, description }: { icon: React.ReactNod
           </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
+

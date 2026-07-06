@@ -51,6 +51,14 @@ export function Navbar() {
             </Link>
           )}
           <DashboardNavLink />
+          {isSignedIn && role === "patient" && (
+            <Link
+              href="/dashboard/consent"
+              className={`transition-colors hover:text-white cursor-pointer ${pathname === "/dashboard/consent" ? "text-white" : ""}`}
+            >
+              Consent
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center shrink-0">

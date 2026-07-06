@@ -24,16 +24,18 @@ export function HomeCta() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <Link href={href} className="w-full sm:w-auto">
           {isDoctor ? (
-            <button className="inline-flex h-14 w-full min-w-44 cursor-pointer items-center justify-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-12 text-sm font-semibold text-emerald-300 backdrop-blur-sm transition-all hover:bg-emerald-500/10 hover:scale-[1.02] active:scale-[0.98]">
+            <button className="inline-flex h-14 w-full min-w-48 cursor-pointer items-center justify-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-12 text-sm font-semibold text-emerald-300 backdrop-blur-sm transition-all hover:bg-emerald-500/10 hover:scale-[1.02] active:scale-[0.98]">
               <Stethoscope className="h-4 w-4" />
               {label}
               <ArrowRight className="h-5 w-5 ml-1 opacity-50" />
             </button>
           ) : (
-            <button className="inline-flex h-14 w-full min-w-44 cursor-pointer items-center justify-center gap-2 rounded-md bg-gradient-to-b from-zinc-800 to-black px-12 text-sm font-semibold text-white border border-white/10 shadow-2xl transition-all hover:from-zinc-700 hover:to-zinc-900 hover:scale-[1.02] active:scale-[0.98]">
-              <User className="h-4 w-4" />
-              {label}
-              <ArrowRight className="h-5 w-5 ml-1" />
+            <button className="inline-flex h-14 w-full min-w-48 cursor-pointer items-center justify-center gap-2 rounded-md border border-white/10 bg-gradient-to-b from-zinc-800 to-black px-8 text-sm font-semibold text-white shadow-2xl transition-all hover:from-zinc-700 hover:to-zinc-900 hover:scale-[1.02] active:scale-[0.98]">
+              <User className="h-4 w-4 shrink-0" />
+              <span className="whitespace-nowrap leading-none">
+                {label}
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0" />
             </button>
           )}
         </Link>
@@ -43,10 +45,13 @@ export function HomeCta() {
 
   return (
     <Link href="/sign-in" className="w-full sm:w-auto">
-      <button className="inline-flex h-14 w-full min-w-44 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#6674CC] px-12 text-sm font-semibold text-white shadow-2xl transition-all hover:scale-[1.02] hover:bg-[#5563bb] active:scale-[0.98]">
+      <button className="inline-flex h-14 w-full min-w-48 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#6674CC] px-12 text-sm font-semibold text-white shadow-2xl transition-all hover:scale-[1.02] hover:bg-[#5563bb] active:scale-[0.98]">
         Get Started
         <ArrowRight className="h-5 w-5 ml-1" />
       </button>
     </Link>
   );
 }
+
+
+

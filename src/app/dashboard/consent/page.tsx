@@ -125,29 +125,29 @@ export default function ConsentPage() {
   const history = requests.filter(r => r.status === "denied" || r.status === "expired");
 
   return (
-    <div className="space-y-10 pb-12 animate-fade-in">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-1.5">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-14 px-6 pb-16 pt-20 animate-fade-in lg:px-8 lg:pt-24">
+      <div className="flex flex-col items-center justify-between gap-8 pb-6 text-center md:flex-row md:items-center md:text-left">
+        <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight text-white">Access Governance</h1>
           <p className="text-zinc-500 text-lg font-medium">Control who can access your medical records on the blockchain.</p>
         </div>
-        <div className="flex items-center gap-4 px-6 py-3.5 rounded-2xl border border-blue-500/10 bg-blue-500/[0.02]">
+        <div className="flex items-center gap-4 rounded-2xl border border-blue-500/10 bg-blue-500/[0.02] px-6 py-3.5">
           <ShieldCheck size={20} className="text-blue-400" />
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none mb-1">Status</span>
+            <span className="mb-1 text-[10px] font-bold uppercase leading-none tracking-widest text-zinc-500">Status</span>
             <span className="text-sm font-bold text-blue-300">Identity Shield Active</span>
           </div>
         </div>
       </div>
 
       {/* Pending Requests */}
+      {/* Pending Requests */}
       {pending.length > 0 && (
-        <section className="space-y-8">
-          <div className="flex items-center gap-4">
+        <section className="flex flex-col">
+          <div className="flex items-center justify-center gap-4">
             <h2 className="text-2xl font-bold text-white tracking-tight">Pending Approval</h2>
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 border border-orange-500/10 text-[12px] font-bold text-orange-400">{pending.length}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="mt-10 grid grid-cols-1 justify-items-center gap-10 md:grid-cols-2 md:gap-10 mt-8!">
             {pending.map(req => (
               <RequestCard
                 key={req.id}
@@ -162,12 +162,11 @@ export default function ConsentPage() {
 
       {/* Active Approved Accesses */}
       {approved.length > 0 && (
-        <section className="space-y-8">
-          <div className="flex items-center gap-4">
+        <section className="flex flex-col">
+          <div className="flex items-center justify-center gap-4">
             <h2 className="text-2xl font-bold text-white tracking-tight">Active Permissions</h2>
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/10 text-[12px] font-bold text-emerald-400">{approved.length}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="mt-10 grid grid-cols-1 justify-items-center gap-10 md:grid-cols-2 md:gap-10 mt-8!">
             {approved.map(req => (
               <ActiveAccessCard
                 key={req.id}
@@ -184,24 +183,24 @@ export default function ConsentPage() {
       {/* History */}
       {history.length > 0 && (
         <section className="space-y-8">
-          <h2 className="text-2xl font-bold text-white tracking-tight">Audit Trail</h2>
-          <div className="glass-card rounded-[32px] border border-white/5 overflow-hidden divide-y divide-white/[0.03]">
+          <h2 className="text-2xl font-bold text-white tracking-tight text-center">Audit Trail</h2>
+          <div className="glass-card rounded-[32px] mt-8! border border-white/5 overflow-hidden divide-y divide-white/[0.03]">
             {history.map(req => (
-              <div key={req.id} className="flex items-center gap-7 p-8 group hover:bg-white/[0.01] transition-colors">
-                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-all duration-500 ${
+              <div key={req.id} className="flex items-center gap-6 pl-24 pr-10 py-8! group hover:bg-white/[0.01] transition-colors">
+                <div className={`flex h-12 w-12 ml-8! shrink-0 items-center justify-center rounded-2xl border transition-all duration-500 ${
                   req.status === "denied" ? "bg-red-500/5 border-red-500/10 text-red-500" : "bg-white/[0.02] border-white/5 text-zinc-500"
                 }`}>
-                  {req.status === "denied" ? <ShieldAlert size={24} /> : <TimerOff size={24} />}
+                  {req.status === "denied" ? <ShieldAlert size={22} /> : <TimerOff size={22} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{req.hospital}</p>
-                  <div className="flex items-center gap-4 text-sm text-zinc-500 mt-1 font-medium">
-                    <span className="flex items-center gap-2 tracking-tight">{req.doctor}</span>
+                  <p className="text-base font-bold text-white group-hover:text-blue-400 transition-colors">{req.hospital}</p>
+                  <div className="flex items-center gap-3 text-[13px] text-zinc-500 mt-1 font-medium">
+                    <span className="tracking-tight">{req.doctor}</span>
                     <span className="text-zinc-700 opacity-50">|</span>
-                    <span className="flex items-center gap-2 tracking-tight opacity-70">{req.requestedAt}</span>
+                    <span className="tracking-tight opacity-70">{req.requestedAt}</span>
                   </div>
                 </div>
-                <span className={`text-[10px] font-bold px-4 py-2 rounded-full border tracking-widest uppercase ${
+                <span className={`text-[10px] mr-8! font-bold px-4 py-2 rounded-full border tracking-widest uppercase whitespace-nowrap ${
                   req.status === "denied"
                     ? "bg-red-500/5 border-red-500/10 text-red-400"
                     : "bg-white/[0.02] border-white/5 text-zinc-500"
@@ -215,12 +214,12 @@ export default function ConsentPage() {
       )}
 
       {/* Security Banner */}
-      <div className="relative overflow-hidden rounded-[32px] border border-blue-500/10 bg-blue-500/[0.02] p-10 group">
+      <div className="relative overflow-hidden rounded-[32px] border border-blue-500/10 bg-blue-500/[0.02] pl-28 pr-14 py-8! group">
         <div className="absolute -top-10 -right-10 p-10 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
           <Lock size={200} className="text-blue-500" />
         </div>
         <div className="relative flex items-start gap-8">
-          <div className="p-4 bg-blue-500/10 rounded-2xl border border-blue-500/10 text-blue-400">
+          <div className="p-4 bg-blue-500/10 ml-10! rounded-2xl border border-blue-500/10 text-blue-400 shrink-0">
             <Lock size={28} />
           </div>
           <div className="space-y-3">
@@ -241,122 +240,119 @@ function RequestCard({ req, onApprove, onDeny }: {
   onDeny: () => void;
 }) {
   return (
-    <div className="glass-card rounded-[32px] border border-orange-500/10 bg-orange-500/[0.01] hover:bg-orange-500/[0.02] overflow-hidden transition-all group">
-      <div className="p-8 space-y-7">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-5">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500/5 border border-orange-500/10 text-orange-400 group-hover:scale-110 transition-transform duration-500">
-              <Hospital size={24} />
-            </div>
-            <div>
-              <p className="text-lg font-bold text-white tracking-tight">{req.hospital}</p>
-              <p className="text-[13px] text-zinc-500 font-medium">{req.doctor} | <span className="text-orange-400/70">{req.speciality}</span></p>
-            </div>
+    <div className="glass-card flex w-full max-w-[470px] min-h-[500px] flex-col overflow-hidden rounded-[28px] border border-orange-500/10 bg-orange-500/[0.01] transition-all group hover:bg-orange-500/[0.02]">
+      <div className="flex flex-col gap-5 px-10 py-6 text-center items-center h-full justify-center">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-3 pt-8">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-500/10 bg-orange-500/5 text-orange-400 transition-transform duration-500 group-hover:scale-110">
+            <Hospital size={22} />
           </div>
-          <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 border border-orange-500/10 px-3 py-1.5 rounded-lg uppercase tracking-[0.1em]">Verification Pending</span>
+          <div className="space-y-0.5">
+            <p className="text-base font-bold tracking-tight text-white">{req.hospital}</p>
+            <p className="text-[13px] font-medium text-zinc-500">{req.doctor}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-400/70">{req.speciality}</p>
+          </div>
+          <span className="rounded-lg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-orange-400">Verification Pending</span>
         </div>
 
-        <div className="flex items-center gap-8 text-[13px] text-zinc-500 font-medium border-t border-white/[0.03] pt-6">
-          <span className="flex items-center gap-2.5"><Clock size={16} className="text-zinc-600" /> {req.requestedAt}</span>
-          <span className="flex items-center gap-2.5"><Calendar size={16} className="text-zinc-600" /> {req.requestedDuration} session</span>
+        {/* Meta row */}
+        <div className="flex items-center justify-center gap-8 border-t border-white/[0.03] pt-4 text-[13px] font-medium text-zinc-500">
+          <span className="flex items-center gap-2"><Clock size={14} className="text-zinc-600" /> {req.requestedAt}</span>
+          <span className="flex items-center gap-2"><Calendar size={14} className="text-zinc-600" /> {req.requestedDuration} session</span>
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-white/[0.03] bg-white/[0.02] p-5 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600 flex items-center gap-2.5">
-              <MessageSquare size={13} className="text-blue-400/50" /> Clinical Rationale
+        {/* Info boxes */}
+        <div className="flex flex-col gap-3 items-center">
+          <div className="w-[78%] rounded-2xl px-5 py-7 space-y-2">
+            <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+              <MessageSquare size={12} className="text-blue-400/50" /> Clinical Rationale
             </p>
-            <p className="text-[14px] text-zinc-300 leading-relaxed font-medium">{req.reason}</p>
+            <p className="text-[15px] font-medium leading-6 text-zinc-300 whitespace-normal break-words text-center">{req.reason}</p>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.03] bg-white/[0.02] p-5 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600 flex items-center gap-2.5">
-              <FileText size={13} className="text-blue-400/50" /> Requested Scope
+          <div className="w-[78%] rounded-2xl px-5 py-7 space-y-2">
+            <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+              <FileText size={12} className="text-blue-400/50" /> Requested Scope
             </p>
-            <p className="text-[14px] text-zinc-300 font-semibold">{req.reportScope}</p>
+            <p className="text-[15px] font-semibold leading-6 text-zinc-300 whitespace-normal break-words text-center">{req.reportScope}</p>
           </div>
         </div>
 
-        <div className="flex gap-4 pt-2">
+        {/* Actions */}
+        <div className="flex justify-center gap-3 pt-1 pb-4">
           <button
             onClick={onApprove}
-            className="flex-1 flex items-center justify-center gap-3 h-14 rounded-2xl bg-emerald-600/90 text-sm font-bold text-white transition-all hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/10"
+            className="flex h-10 w-36 items-center justify-center gap-2 rounded-xl bg-emerald-600/90 text-xs font-bold text-white shadow-lg shadow-emerald-500/10 transition-all hover:scale-[1.02] hover:bg-emerald-500 active:scale-[0.98]"
           >
-            <CheckCircle2 size={18} /> Approve Access
+            <CheckCircle2 size={14} /> Approve Access
           </button>
           <button
             onClick={onDeny}
-            className="flex-1 flex items-center justify-center gap-3 h-14 rounded-2xl border border-white/5 bg-white/[0.03] text-sm font-bold text-zinc-400 hover:bg-red-500/5 hover:text-red-400 hover:border-red-500/10 transition-all"
+            className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.03] text-xs font-bold text-zinc-400 transition-all hover:border-red-500/10 hover:bg-red-500/5 hover:text-red-400"
           >
-            <X size={18} /> Deny
+            <X size={14} /> Deny
           </button>
         </div>
       </div>
     </div>
   );
 }
-
 function ActiveAccessCard({ req, countdown, nowMs, onRevoke }: { req: AccessRequest; countdown: string; nowMs: number; onRevoke: () => void }) {
   const isExpiringSoon = req.expiresAt ? (req.expiresAt.getTime() - nowMs) < 3600000 : false;
 
   return (
-    <div className="glass-card rounded-[32px] border border-emerald-500/10 bg-emerald-500/[0.01] overflow-hidden group transition-all">
-      <div className="p-8 space-y-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-5">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform duration-500">
-              <Unlock size={24} />
-            </div>
-            <div>
-              <p className="text-lg font-bold text-white tracking-tight">{req.hospital}</p>
-              <p className="text-[13px] text-zinc-500 font-medium">{req.doctor} | <span className="text-emerald-400/70">{req.speciality}</span></p>
-            </div>
+    <div className="glass-card flex flex-col w-full max-w-[470px] min-h-[500px] overflow-hidden rounded-[28px] border border-emerald-500/10 bg-emerald-500/[0.01] transition-all group relative">
+      {/* Countdown Timer - Top Right */}
+      <div className="absolute top-4 right-4 flex flex-col items-center gap-1 z-10">
+        <div className={`rounded-xl p-1.5 ${isExpiringSoon ? "bg-orange-500/10 text-orange-400 animate-pulse" : "bg-emerald-500/10 text-emerald-400"}`}>
+          <Clock size={16} />
+        </div>
+        <p className={`text-[9px] font-bold uppercase tracking-widest ${isExpiringSoon ? "text-orange-400" : "text-emerald-400"}`}>
+          Expiry
+        </p>
+        <p className={`font-mono text-base font-bold tracking-tight ${isExpiringSoon ? "text-orange-300" : "text-emerald-300"}`}>
+          {countdown}
+        </p>
+        {isExpiringSoon && (
+          <p className="flex items-center gap-0.5 text-[8px] font-bold uppercase text-orange-400/90 mt-1">
+            <ShieldAlert size={9} />
+          </p>
+        )}
+      </div>
+      
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-10 py-12 text-center">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-400 transition-transform duration-500 group-hover:scale-110">
+            <Unlock size={18} />
           </div>
-          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/10 px-3 py-1.5 rounded-lg uppercase tracking-[0.1em]">Session Active</span>
+          <div className="space-y-0.5">
+            <p className="text-base font-bold tracking-tight text-white">{req.hospital}</p>
+            <p className="text-[12px] font-medium text-zinc-500">{req.doctor}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-400/70">{req.speciality}</p>
+          </div>
+          <span className="rounded-lg px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-emerald-400">Session Active</span>
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-white/[0.03] bg-white/[0.02] p-5 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600 flex items-center gap-2.5">
-              <FileText size={13} className="text-emerald-400/50" /> Granted Records
-            </p>
-            <p className="text-[14px] text-zinc-200 font-bold">{req.reportScope}</p>
-          </div>
-
-          {/* Countdown Timer */}
-          <div className={`relative overflow-hidden rounded-[24px] border p-6 transition-colors duration-500 ${isExpiringSoon ? "border-orange-500/20 bg-orange-500/[0.03]" : "border-emerald-500/10 bg-emerald-500/[0.03]"}`}>
-            <div className="relative flex items-center justify-between">
-              <div className="space-y-1">
-                <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isExpiringSoon ? "text-orange-400" : "text-emerald-400"}`}>
-                  Access Expiry
-                </p>
-                <p className={`font-mono text-3xl font-bold tracking-tighter ${isExpiringSoon ? "text-orange-300" : "text-emerald-300"}`}>
-                  {countdown}
-                </p>
-              </div>
-              <div className={`p-3 rounded-xl ${isExpiringSoon ? "bg-orange-500/10 text-orange-400 animate-pulse" : "bg-emerald-500/10 text-emerald-400"}`}>
-                <Clock size={24} />
-              </div>
-            </div>
-            {isExpiringSoon && (
-              <p className="mt-4 text-[11px] font-bold text-orange-400/80 flex items-center gap-2 uppercase tracking-wider">
-                <ShieldAlert size={12} /> Critical: Access will auto-revoke soon
-              </p>
-            )}
-          </div>
+        {/* Granted Records */}
+        <div className="w-[90%] rounded-2xl px-5 py-5 space-y-2 flex flex-col justify-center">
+          <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+            <FileText size={12} className="text-emerald-400/50" /> Granted Records
+          </p>
+          <p className="text-[13px] font-bold leading-relaxed text-zinc-200">{req.reportScope}</p>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-white/[0.02] border border-white/[0.03]">
-            <Lock size={15} className="text-zinc-600 shrink-0" />
-            <p className="text-[12px] text-zinc-500 font-medium leading-tight">Identity Shielding active. Download permissions are permanently disabled for this session.</p>
+        {/* Footer */}
+        <div className="flex flex-col gap-2 items-center text-center">
+          <div className="flex flex-col items-center gap-1.5">
+            <Lock size={14} className="shrink-0 text-zinc-600" />
+            <p className="text-[12px] font-medium leading-5 text-zinc-500 whitespace-normal break-words max-w-[260px]">Identity Shielding active. Download permissions are permanently disabled for this session.</p>
           </div>
-
           <button
             onClick={onRevoke}
-            className="w-full flex items-center justify-center gap-3 h-14 rounded-2xl border border-white/5 bg-white/[0.02] text-sm font-bold text-red-400/80 hover:bg-red-500/5 hover:text-red-400 hover:border-red-500/10 transition-all"
+            className="flex h-11 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-red-400/80 transition-all hover:text-red-400"
           >
-            <TimerOff size={18} /> Terminate Access Session
+            <TimerOff size={16} /> Terminate Access Session
           </button>
         </div>
       </div>

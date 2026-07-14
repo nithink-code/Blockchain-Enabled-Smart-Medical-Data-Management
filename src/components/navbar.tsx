@@ -43,11 +43,6 @@ export function Navbar() {
 
   // Safety check for pathname
   if (!pathname) return null;
-  
-  // Previously we were hiding the navbar on dashboard/hospital pages, 
-  // but the user wants it visible everywhere.
-  // const isDashboardPage = pathname.startsWith("/dashboard") || pathname.startsWith("/hospital");
-  // if (isDashboardPage) return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-center bg-black/30 border-b border-white/[0.07] backdrop-blur-xl">

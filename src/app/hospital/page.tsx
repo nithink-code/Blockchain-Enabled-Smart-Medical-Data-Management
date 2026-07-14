@@ -71,24 +71,24 @@ export default function HospitalDashboard() {
   }, []);
 
   return (
-    <div className="space-y-8 pb-10 animate-fade-in mt-20!">
-      <div className="space-y-2 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-400 mb-10!">
+    <div className="space-y-8 pb-10 animate-fade-in flex flex-col items-center w-full">
+      <div className="space-y-2 text-center max-w-4xl w-full">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-400 mb-4">
           Medical dashboard
         </p>
         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Recent Patient Records
         </h1>
-        <p className="mx-auto max-w-3xl text-base text-zinc-400 sm:text-lg mt-5! ml-60! mb-8!">
+        <p className="mx-auto max-w-3xl text-base text-zinc-400 sm:text-lg mt-4 mb-8">
           Patient records appear here immediately after upload and are centered for a clean
           dashboard view.
         </p>
       </div>
 
-      <div className="mx-auto w-full max-w-[1120px] space-y-4">
-        <div className="flex items-end justify-between gap-4 px-1 ml-10! mb-8!">
+      <div className="w-full max-w-[1120px] space-y-4">
+        <div className="flex items-end justify-between gap-4 mb-6">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 ml-130! mb-10! mt-6!">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
               Patient Reports
             </p>
             <h2 className="text-2xl font-bold tracking-tight text-white">
@@ -107,7 +107,7 @@ export default function HospitalDashboard() {
             </p>
           </div>
         ) : (
-          <div className="grid w-full auto-rows-fr gap-8 sm:grid-cols-2 justify-items-stretch lg:translate-x-8 xl:translate-x-12">
+          <div className="grid w-full auto-rows-fr gap-8 sm:grid-cols-2 justify-items-stretch">
             {records.map((record) => (
               <PatientRecordCard key={record.id} record={record} />
             ))}
@@ -122,42 +122,42 @@ function PatientRecordCard({ record }: { record: RecordView }) {
   const confidence = record.confidence;
 
   return (
-    <div className="glass-card flex h-full min-h-[390px] w-full flex-col rounded-[28px] border border-white/5 p-5 transition-all duration-300 hover:border-white/10 md:p-6 p-5!">
+    <div className="glass-card flex h-full min-h-[390px] w-full flex-col rounded-[28px] border border-white/5 p-5 transition-all duration-300 hover:border-white/10 md:p-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 space-y-1 ">
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 p-2!">
+        <div className="min-w-0 space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
             {record.type}
           </p>
-          <h3 className="text-lg font-bold tracking-tight text-white line-clamp-1 md:text-xl p-2!">
+          <h3 className="text-lg font-bold tracking-tight text-white line-clamp-1 md:text-xl">
             {record.title}
           </h3>
-          <p className="text-sm text-zinc-500 p-2!">{record.date}</p>
+          <p className="text-sm text-zinc-500">{record.date}</p>
         </div>
 
         <span
-          className={`rounded-full border p-3! px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${record.statusClass}`}
+          className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${record.statusClass}`}
         >
           {record.status}
         </span>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-white/5 bg-white/[0.02] p-4!">
+      <div className="mt-5 rounded-2xl border border-white/5 bg-white/[0.02] p-4">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
           <BadgeInfo size={14} className="text-blue-400" />
           Patient details
         </div>
-        <div className="mt-3 space-y-2.5 p-4!">
+        <div className="mt-3 space-y-2.5">
           <DetailRow label="Patient" value={record.patientLabel} />
           <DetailRow label="Info" value={record.ageGender || "Not provided"} />
           <DetailRow label="CID" value={record.cid} mono />
         </div>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-zinc-400 p-4!">
+      <p className="mt-4 text-sm leading-6 text-zinc-400">
         {record.aiSummary || "AI analysis in progress."}
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-2 p-4!">
+      <div className="mt-4 flex flex-wrap gap-2">
         {record.conditions.length > 0 ? (
           record.conditions.map((condition) => (
             <span

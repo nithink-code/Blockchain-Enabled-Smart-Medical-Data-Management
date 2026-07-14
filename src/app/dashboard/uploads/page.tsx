@@ -2,6 +2,7 @@
 
 import { Upload, FileText, CheckCircle2, Clock, Trash2, ExternalLink, X, Loader, Activity, User, Info } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { saveRecentActivity } from "@/lib/recent-activity";
 
@@ -82,7 +83,7 @@ function persistAnalysisResult(analysisResult: unknown) {
 }
 
 function subscribeToAnalysisStore(onStoreChange: () => void) {
-  if (typeof window === "undefined") return () => {};
+  if (typeof window === "undefined") return () => { };
 
   const handler = () => onStoreChange();
   window.addEventListener("storage", handler);
@@ -335,7 +336,7 @@ export default function UploadsPage() {
         console.log("Analysis Result:", result);
         const analysis = result.data.analysis;
         const patient = result.data.patient;
-        
+
         // Add the new document to the list
         const newDoc = {
           id: `DOC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
@@ -345,7 +346,7 @@ export default function UploadsPage() {
           status: "Verified",
           size: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`
         };
-        
+
         setDocuments(prev => [newDoc, ...prev]);
         persistAnalysisResult(analysis);
 
@@ -371,7 +372,7 @@ export default function UploadsPage() {
             ? Math.round(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100)
             : null,
         });
-        
+
         setUploadProgress(100);
         setTimeout(() => {
           setIsUploading(false);
@@ -506,64 +507,67 @@ export default function UploadsPage() {
         </div>
       </div>
 
-      {/* Upload Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+      {/* Upload Modal – rendered into document.body via portal to escape any CSS containing block */}
+      {showModal && typeof document !== "undefined" && createPortal(
+        <>
+          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm"
             onClick={() => !isUploading && setShowModal(false)}
           />
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-[40px] border border-white/5 bg-[#0A0A0A] shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none" />
-            
-            <div className="relative p-8 md:px-16 flex flex-col justify-center" style={{ height: "450px" }}>
-              <div className="flex items-start justify-between mb-6 text-center">
-                <div className="w-full">
+          {/* Modal Card */}
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+            <div className="relative w-full max-w-lg rounded-2xl border border-white/5 bg-[#0A0A0A] shadow-2xl animate-in zoom-in-95 duration-300 pointer-events-auto">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-2xl" />
+
+              <div className="relative p-6 max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="text-center mb-5 pr-8">
                   <h2 className="text-3xl font-bold text-white tracking-tight">Upload Document</h2>
                   <p className="text-zinc-500 text-sm mt-1">Provide patient details and upload the medical report.</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowModal(false)}
                   disabled={isUploading}
-                  className="absolute right-8 top-8 rounded-full p-2 text-zinc-600 hover:bg-white/5 hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                  className="absolute right-5 top-5 rounded-full p-2 text-zinc-600 hover:bg-white/5 hover:text-white transition-all cursor-pointer disabled:opacity-50"
                 >
                   <X size={24} />
                 </button>
-              </div>
 
-              <form onSubmit={handleUpload} className="mx-auto w-full max-w-lg space-y-6">
-                <div className="space-y-4 pt-4">
-                  <div className="space-y-3">
-                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Full Name</label>
-                    <input 
+                <form onSubmit={handleUpload} className="space-y-5">
+                  {/* Full Name */}
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block ml-1">Full Name</label>
+                    <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. John Doe"
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all text-lg"
+                      className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-5 py-3 text-white placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Age</label>
-                      <input 
+                  {/* Age + Gender */}
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block ml-1">Age</label>
+                      <input
                         type="number"
                         required
                         value={formData.age}
                         onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                         placeholder="Age"
-                        className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all text-lg"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-5 py-3 text-white placeholder:text-zinc-700 focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Gender</label>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block ml-1">Gender</label>
                       <div className="relative">
-                        <select 
+                        <select
                           value={formData.gender}
                           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-6 py-4 text-white text-left focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all appearance-none cursor-pointer text-lg"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-5 py-3 text-white focus:border-blue-500/50 focus:outline-none transition-all appearance-none cursor-pointer"
                         >
                           <option value="Male" className="bg-[#0A0A0A]">Male</option>
                           <option value="Female" className="bg-[#0A0A0A]">Female</option>
@@ -576,56 +580,57 @@ export default function UploadsPage() {
                     </div>
                   </div>
 
-                    <div className="space-y-4 pt-4">
-                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block text-left ml-1">Medical Report (PDF Only)</label>
-                    <div className="relative">
-                      <input 
-                        type="file"
-                        accept={allowedFileTypes.join(",")}
-                        required
-                        onChange={handleFileChange}
-                        className="hidden"
-                        id="file-upload"
-                      />
-                      <label 
-                        htmlFor="file-upload"
-                        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-16 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
-                      >
-                        <div className={`rounded-full p-4 transition-colors ${selectedFile ? 'bg-blue-500/10 text-blue-400' : 'bg-zinc-900/50 text-zinc-600'}`}>
-                          {selectedFile ? <FileText size={32} /> : <Upload size={32} />}
-                        </div>
-                        <div className="text-center">
-                          <p className={`text-base font-medium ${selectedFile ? 'text-blue-400' : 'text-zinc-400'}`}>
-                            {selectedFile ? selectedFile.name : 'Choose a file or drag here'}
-                          </p>
-                          {!selectedFile && <p className="text-sm text-zinc-600 mt-2">PDF documents only, max 10MB</p>}
-                        </div>
-                      </label>
-                    </div>
+                  {/* File Upload */}
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-bold uppercase tracking-[0.2em] text-zinc-500 block ml-1">Medical Report (PDF Only)</label>
+                    <input
+                      type="file"
+                      accept={allowedFileTypes.join(",")}
+                      required
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className={`flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-10 transition-all hover:bg-white/[0.04] ${selectedFile ? 'border-blue-500/30 bg-blue-500/5' : ''}`}
+                    >
+                      <div className={`rounded-full p-3 transition-colors ${selectedFile ? 'bg-blue-500/10 text-blue-400' : 'bg-zinc-900/50 text-zinc-600'}`}>
+                        {selectedFile ? <FileText size={28} /> : <Upload size={28} />}
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-sm font-medium ${selectedFile ? 'text-blue-400' : 'text-zinc-400'}`}>
+                          {selectedFile ? selectedFile.name : 'Choose a file or drag here'}
+                        </p>
+                        {!selectedFile && <p className="text-xs text-zinc-600 mt-1">PDF documents only, max 10MB</p>}
+                      </div>
+                    </label>
                   </div>
-                </div>
 
-                <button 
-                  type="submit"
-                  disabled={isUploading || !selectedFile}
-                  className="relative mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-4 overflow-hidden rounded-xl bg-blue-600 py-5 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader className="h-6 w-6 animate-spin" />
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-6 w-6" />
-                      <span>Upload & Analyze</span>
-                    </>
-                  )}
-                </button>
-              </form>
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={isUploading || !selectedFile}
+                    className="mt-4 flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg bg-blue-600 py-3 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader className="h-5 w-5 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-5 w-5" />
+                        <span>Upload & Analyze</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        </>,
+        document.body
       )}
 
       {/* Upload Progress (Simulated) */}

@@ -111,7 +111,7 @@ export default function DashboardLayout({
       )}
 
       {/* Page Content */}
-      <main className="w-full overflow-y-auto scroll-smooth">
+      <main className="w-full scroll-smooth">
         <div className="app-shell py-10">
           {children}
         </div>

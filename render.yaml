@@ -37,3 +37,5 @@ services:
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false
+      - key: NEXT_PUBLIC_UPLOAD_API_URL
+        value: https://major-project-node-deloyment.onrender.com/api/upload-report

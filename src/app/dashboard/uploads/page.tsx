@@ -10,6 +10,48 @@ const ANALYSIS_STORAGE_KEY = "medchain:uploads-analysis-result";
 let persistedAnalysisCacheKey: string | null = null;
 let persistedAnalysisCacheValue: unknown = null;
 
+const UPLOAD_API_URL =
+  process.env.NEXT_PUBLIC_UPLOAD_API_URL ??
+  "https://major-project-node-deloyment.onrender.com/api/upload-report";
+
+/** Normalizes the backend's analysis payload (shape not fully guaranteed since it
+ * comes from a separate ML service) into what this page's charts/table expect. */
+function normalizeUploadsAnalysis(rawData: any) {
+  const analysis = rawData?.analysis ?? {};
+  const explanation = analysis?.explanation ?? {};
+
+  const rawLime = explanation?.lime_local_impact;
+  const lime_local_impact: [string, number][] = Array.isArray(rawLime)
+    ? rawLime.filter(
+        (item: any) => Array.isArray(item) && typeof item[0] === "string" && typeof item[1] === "number"
+      )
+    : [];
+
+  const rawShap = explanation?.shap_global_contribution;
+  const shap_global_contribution: Record<string, number> =
+    rawShap && typeof rawShap === "object" && !Array.isArray(rawShap)
+      ? (Object.fromEntries(
+          Object.entries(rawShap).filter(([, v]) => typeof v === "number")
+        ) as Record<string, number>)
+      : {};
+
+  const probability = analysis?.probability ?? {};
+  const extracted_data = analysis?.extracted_data && typeof analysis.extracted_data === "object"
+    ? analysis.extracted_data
+    : {};
+
+  return {
+    cid: typeof rawData?.cid === "string" ? rawData.cid : null,
+    prediction: analysis?.prediction ?? "Unknown",
+    probability: {
+      benign: typeof probability?.benign === "number" ? probability.benign : 0,
+      malignant: typeof probability?.malignant === "number" ? probability.malignant : 0,
+    },
+    explanation: { lime_local_impact, shap_global_contribution },
+    extracted_data,
+  };
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -318,35 +360,33 @@ export default function UploadsPage() {
 
     const data = new FormData();
     data.append('file', selectedFile);
-    data.append('name', formData.name);
-    data.append('age', formData.age);
-    data.append('gender', formData.gender);
 
     try {
       setUploadProgress(30);
-      const response = await fetch('/api/analyze', {
+      const response = await fetch(UPLOAD_API_URL, {
         method: 'POST',
         body: data,
       });
 
       setUploadProgress(70);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Analysis Result:", result);
-        const analysis = result.data.analysis;
-        const patient = result.data.patient;
-        
+      const rawResult = await response.json().catch(() => null);
+
+      if (response.ok && rawResult) {
+        console.log("Analysis Result:", rawResult);
+        const analysis = normalizeUploadsAnalysis(rawResult);
+        const patient = formData;
+
         // Add the new document to the list
         const newDoc = {
           id: `DOC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
           name: selectedFile.name,
           date: new Date().toISOString().split('T')[0],
-          type: result.category || "Clinical Report",
+          type: "Clinical Report",
           status: "Verified",
           size: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`
         };
-        
+
         setDocuments(prev => [newDoc, ...prev]);
         persistAnalysisResult(analysis);
 
@@ -361,18 +401,14 @@ export default function UploadsPage() {
           provider: `${patient.name} • ${patient.age} • ${patient.gender}`,
           status: "Analyzed",
           type: "Clinical Report",
-          cid: `Qm${Math.random().toString(36).slice(2, 18)}${Math.random().toString(36).slice(2, 10)}`,
-          aiSummary: analysis?.prediction
+          cid: analysis.cid ?? `Qm${Math.random().toString(36).slice(2, 18)}${Math.random().toString(36).slice(2, 10)}`,
+          aiSummary: analysis.prediction !== "Unknown"
             ? `${analysis.prediction} report with ${(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100).toFixed(1)}% confidence.`
             : "AI analysis completed.",
-          conditions: analysis?.explanation?.lime_local_impact
-            ? analysis.explanation.lime_local_impact.slice(0, 3).map(([feature]: [string, number]) => feature)
-            : [],
-          confidence: analysis?.probability
-            ? Math.round(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100)
-            : null,
+          conditions: analysis.explanation.lime_local_impact.slice(0, 3).map(([feature]) => feature),
+          confidence: Math.round(Math.max(analysis.probability.benign, analysis.probability.malignant) * 100),
         });
-        
+
         setUploadProgress(100);
         setTimeout(() => {
           setIsUploading(false);
@@ -382,7 +418,7 @@ export default function UploadsPage() {
           setFormData({ name: '', age: '', gender: 'Male' });
         }, 1000);
       } else {
-        alert("Upload failed.");
+        alert(rawResult?.error || rawResult?.message || `Upload failed (HTTP ${response.status}).`);
         setIsUploading(false);
       }
     } catch (error) {

@@ -28,9 +28,10 @@ import dynamic from "next/dynamic";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-type Stage = "idle" | "selected" | "uploading" | "ocr" | "ai" | "xai" | "storing" | "done";
+type Stage = "idle" | "selected" | "uploading" | "ocr" | "ai" | "xai" | "storing" | "done" | "error";
 
 interface AnalysisResult {
+  cid: string | null;
   extractedContent: string;
   analysis: {
     success: boolean;
@@ -43,6 +44,49 @@ interface AnalysisResult {
       lime_local_impact: [string, number][];
       shap_global_contribution: Record<string, number>;
     };
+  };
+}
+
+const UPLOAD_API_URL =
+  process.env.NEXT_PUBLIC_UPLOAD_API_URL ??
+  "https://major-project-node-deloyment.onrender.com/api/upload-report";
+
+/** Normalizes whatever the backend returns into the shape the UI expects, so a
+ * partial/differently-shaped response still renders instead of crashing. */
+function normalizeAnalysisResult(data: any): AnalysisResult {
+  const analysis = data?.analysis ?? data ?? {};
+  const explanation = analysis?.explanation ?? {};
+  const rawLime = explanation?.lime_local_impact;
+  const lime_local_impact: [string, number][] = Array.isArray(rawLime)
+    ? rawLime.filter(
+        (item: any) => Array.isArray(item) && typeof item[0] === "string" && typeof item[1] === "number"
+      )
+    : rawLime && typeof rawLime === "object"
+      ? Object.entries(rawLime).filter(([, v]) => typeof v === "number") as [string, number][]
+      : [];
+
+  const rawShap = explanation?.shap_global_contribution;
+  const shap_global_contribution: Record<string, number> =
+    rawShap && typeof rawShap === "object" && !Array.isArray(rawShap)
+      ? (Object.fromEntries(
+          Object.entries(rawShap).filter(([, v]) => typeof v === "number")
+        ) as Record<string, number>)
+      : {};
+
+  const probability = analysis?.probability ?? {};
+
+  return {
+    cid: typeof data?.cid === "string" ? data.cid : null,
+    extractedContent: data?.extractedContent ?? analysis?.extractedContent ?? "",
+    analysis: {
+      success: analysis?.success ?? data?.success ?? true,
+      prediction: analysis?.prediction ?? "Unknown",
+      probability: {
+        benign: typeof probability?.benign === "number" ? probability.benign : 0,
+        malignant: typeof probability?.malignant === "number" ? probability.malignant : 0,
+      },
+      explanation: { lime_local_impact, shap_global_contribution },
+    },
   };
 }
 
@@ -81,6 +125,7 @@ export default function UploadReportPage() {
   const [showShap, setShowShap] = useState(true);
   const [dragOver, setDragOver] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -116,7 +161,8 @@ export default function UploadReportPage() {
 
   async function runPipeline() {
     if (!file) return;
-    
+
+    setErrorMessage(null);
     setStage("uploading");
     await delay(500);
     setStage("ocr");
@@ -126,22 +172,27 @@ export default function UploadReportPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("https://ocr-endpoint.onrender.com/api/upload-report", {
+      const response = await fetch(UPLOAD_API_URL, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Analysis failed");
+      const rawData = await response.json().catch(() => null);
 
-      const data = await response.json();
+      if (!response.ok || !rawData) {
+        const backendMessage = rawData?.error || rawData?.message;
+        throw new Error(backendMessage || `Analysis failed (HTTP ${response.status})`);
+      }
+
+      const data = normalizeAnalysisResult(rawData);
 
       // ── Persist result to localStorage so dashboard & reports page update ──
-      const prediction: string = data?.analysis?.prediction ?? "Unknown";
-      const malignantProb: number = data?.analysis?.probability?.malignant ?? 0;
+      const prediction = data.analysis.prediction;
+      const malignantProb = data.analysis.probability.malignant;
       const conditions: string[] = prediction === "Malignant"
         ? ["Malignant Finding Detected"]
         : [];
-      const extractedFields = data?.analysis?.extracted_data ?? {};
+      const extractedFields = rawData?.analysis?.extracted_data ?? {};
       const fieldCount = Object.keys(extractedFields).length;
 
       saveRecentActivity({
@@ -155,9 +206,9 @@ export default function UploadReportPage() {
         provider: "Patient Upload",
         status: "Analyzed",
         type: file.name.endsWith(".pdf") ? "PDF Report" : "Image Scan",
-        cid: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+        cid: data.cid ?? `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
         aiSummary:
-          data?.extractedContent
+          data.extractedContent
             ? data.extractedContent.substring(0, 240) + "..."
             : `Prediction: ${prediction}. Malignant probability: ${(malignantProb * 100).toFixed(1)}%. ${fieldCount} clinical fields extracted.`,
         conditions,
@@ -179,16 +230,15 @@ export default function UploadReportPage() {
       await delay(1000);
       setStage("done");
       setCurrentPipelineIdx(4);
-      
+
       // Save everything to localStorage
       localStorage.setItem("upload_stage", "done");
       localStorage.setItem("upload_pipeline_idx", "4");
       localStorage.setItem("upload_analysis_result", JSON.stringify(data));
     } catch (error) {
       console.error(error);
-      setStage("idle");
-      setFile(null);
-      alert("Error analyzing document. Please try again.");
+      setErrorMessage(error instanceof Error ? error.message : "Error analyzing document. Please try again.");
+      setStage("error");
     }
   }
 
@@ -277,7 +327,7 @@ export default function UploadReportPage() {
         </div>
       )}
 
-      {(stage !== "idle" && stage !== "selected" && stage !== "done") && (
+      {(stage !== "idle" && stage !== "selected" && stage !== "done" && stage !== "error") && (
         <div className="space-y-10">
           {/* Selected file card */}
           {file && (
@@ -337,6 +387,38 @@ export default function UploadReportPage() {
         </div>
       )}
 
+      {stage === "error" && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex w-full justify-center">
+          <div className="flex w-full max-w-4xl flex-col items-center gap-8 rounded-[48px] border border-rose-500/10 bg-rose-500/[0.03] p-16 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-rose-500/10 border border-rose-500/10 text-rose-400">
+              <AlertCircle size={40} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-white">Analysis Failed</p>
+              <p className="text-sm text-zinc-500 max-w-md">{errorMessage ?? "Something went wrong while analyzing the document."}</p>
+            </div>
+            <div className="flex gap-4">
+              <button
+                onClick={() => { setFile(null); setStage("idle"); setErrorMessage(null); }}
+                className="flex h-14 items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-8 text-sm font-bold text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
+              >
+                <X size={20} />
+                Cancel
+              </button>
+              {file && (
+                <button
+                  onClick={runPipeline}
+                  className="premium-button flex h-14 items-center gap-3 rounded-2xl px-10 text-sm font-bold text-white shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)]"
+                >
+                  <Zap size={20} />
+                  Retry Analysis
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {stage === "done" && (
         <div className="space-y-10">
           {/* Success Banner */}
@@ -363,7 +445,7 @@ export default function UploadReportPage() {
               </div>
               <div className="bg-black/20 rounded-2xl p-5 border border-white/[0.03]">
                 <p className="font-mono text-[13px] font-bold text-zinc-300 break-all leading-relaxed">
-                  {analysisResult ? `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}` : MOCK_RESULT.cid}
+                  {analysisResult?.cid ?? MOCK_RESULT.cid}
                 </p>
               </div>
               <div className="flex items-center gap-3 pt-2">
@@ -436,7 +518,7 @@ export default function UploadReportPage() {
                   </div>
                 </div>
               </div>
-              {analysisResult?.analysis?.explanation?.lime_local_impact && (
+              {analysisResult && analysisResult.analysis.explanation.lime_local_impact.length > 0 ? (
                 <div className="p-10">
                   <Plot
                     data={[
@@ -480,6 +562,11 @@ export default function UploadReportPage() {
                     className="w-full"
                   />
                 </div>
+              ) : (
+                <div className="p-20 text-center">
+                  <Loader2 className="mx-auto h-8 w-8 text-indigo-500 animate-spin mb-4" />
+                  <p className="text-zinc-500 font-medium">Waiting for LIME analysis data...</p>
+                </div>
               )}
             </div>
 
@@ -500,7 +587,7 @@ export default function UploadReportPage() {
                 </div>
               </div>
               
-              {analysisResult?.analysis?.explanation?.shap_global_contribution ? (
+              {analysisResult && Object.keys(analysisResult.analysis.explanation.shap_global_contribution).length > 0 ? (
                 <div className="p-10">
                   <Plot
                     data={[
@@ -565,7 +652,7 @@ export default function UploadReportPage() {
                   </div>
                 </div>
               </div>
-              {analysisResult?.analysis?.explanation?.shap_global_contribution && (
+              {analysisResult && Object.keys(analysisResult.analysis.explanation.shap_global_contribution).length > 0 && (
                 <div className="p-10 relative">
                   <Plot
                     data={[

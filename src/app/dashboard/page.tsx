@@ -94,22 +94,22 @@ export default function Dashboard() {
       <div className="grid w-full max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 ml-5!">
         <StatsCard
           title="Medical Reports"
-          value={totalReports > 0 ? String(totalReports) : "�"}
+          value={String(totalReports)}
           icon={<FileText className="text-blue-400" size={28} />}
         />
         <StatsCard
           title="Active Consents"
-          value={activeConsents > 0 ? String(activeConsents) : "�"}
+          value={String(activeConsents)}
           icon={<ShieldCheck className="text-emerald-400" size={28} />}
         />
         <StatsCard
           title="Health Score"
-          value={totalReports > 0 ? `${avgConfidence}%` : "�"}
+          value={totalReports > 0 ? `${avgConfidence}%` : "0%"}
           icon={<Activity className="text-rose-400" size={28} />}
         />
         <StatsCard
           title="Data Points"
-          value={totalReports > 0 && dataPointsRaw > 0 ? dataPoints : "�"}
+          value={totalReports > 0 && dataPointsRaw > 0 ? dataPoints : "0"}
           icon={<Database className="text-purple-400" size={28} />}
         />
       </div>

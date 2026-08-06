@@ -59,6 +59,15 @@ export function deleteRecentActivity(recordId: string) {
   }
 }
 
+export function parseProviderLabel(provider: string) {
+  const parts = provider.includes("â€¢")
+    ? provider.split("â€¢")
+    : provider.split(/[•·]/);
+  const [name = "Patient", age = "", gender = ""] = parts.map((part) => part.trim()).filter(Boolean);
+
+  return { name, age, gender };
+}
+
 function normalizeRecord(input: unknown): RecentActivityRecord | null {
   if (!input || typeof input !== "object") return null;
   const value = input as Record<string, unknown>;

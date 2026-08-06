@@ -706,16 +706,18 @@ export default function UploadsPage() {
       {/* Upload Progress (Simulated) */}
       {isUploading && (
         <div className="fixed inset-x-0 bottom-8 flex justify-center z-[110] px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900/90 p-4 backdrop-blur-xl shadow-2xl animate-in slide-in-from-bottom-8">
-            <div className="mb-3 flex items-center justify-between">
+          <div className="flex w-full max-w-lg min-h-[88px] flex-col justify-center rounded-2xl border border-white/10 bg-zinc-900/90 p-5 backdrop-blur-xl shadow-2xl animate-in slide-in-from-bottom-8">
+            <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
                 <span className="text-sm font-medium text-white">Analyzing with MedGemma...</span>
               </div>
               <span className="text-xs text-zinc-400">{uploadProgress}%</span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-              <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${uploadProgress}%` }} />
+            <div className="px-3">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${uploadProgress}%` }} />
+              </div>
             </div>
           </div>
         </div>

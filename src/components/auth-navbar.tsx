@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { 
   LogOut, 
-  Settings, 
   LayoutDashboard, 
   Stethoscope, 
   User as UserIcon,
@@ -41,7 +40,6 @@ export function AuthNavbar() {
 
   const portalHref = isHospital ? "/hospital" : "/dashboard";
   const portalLabel = isHospital ? "Hospital Portal" : "Patient Dashboard";
-  const settingsHref = isHospital ? "/hospital/settings" : "/dashboard/settings";
 
   return (
     <div className="-translate-x-4 flex items-center gap-4">
@@ -49,10 +47,13 @@ export function AuthNavbar() {
         <div className="relative" ref={dropdownRef}>
           {/* User Avatar Button */}
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2.5 p-1 pr-3 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer shadow-lg shadow-black/30"
+            aria-expanded={isOpen}
+            aria-haspopup="menu"
+            className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 p-1.5 pr-3 transition-all hover:border-white/20 hover:bg-white/10 cursor-pointer shadow-lg shadow-black/30"
           >
-            <div className="h-9 w-9 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-bold text-sm shadow-inner">
+            <div className="h-9 w-9 rounded-full overflow-hidden flex items-center justify-center bg-linear-to-tr from-blue-600 to-indigo-500 text-white font-bold text-sm shadow-inner">
               {userImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={userImage} alt={displayName} className="h-full w-full object-cover" />
@@ -75,11 +76,11 @@ export function AuthNavbar() {
 
           {/* Dropdown Menu */}
           {isOpen && (
-            <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur-2xl p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-3 py-3 border-b border-white/5 space-y-1">
-                <p className="text-xs text-zinc-400 font-medium">Signed in as</p>
-                <p className="text-sm font-bold text-white truncate">{session?.user?.email}</p>
-                <div className="pt-1">
+            <div className="absolute right-0 z-50 mt-3 w-64 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/95 p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150" role="menu">
+              <div className="space-y-2 border-b border-white/10 px-3 py-3.5 text-center">
+                <p className="text-[11px] font-medium text-zinc-500">Signed in as</p>
+                <p className="truncate text-sm font-bold text-white">{session?.user?.email}</p>
+                <div className="flex justify-center pt-0.5">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
                     isHospital 
                       ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
@@ -91,35 +92,34 @@ export function AuthNavbar() {
                 </div>
               </div>
 
-              <div className="py-2 space-y-1">
+              <div className="space-y-1.5 py-3">
                 <Link
                   href={portalHref}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                  className="flex h-10 items-center gap-3 rounded-lg px-3 text-xs font-semibold text-zinc-300 transition-all hover:bg-white/8 hover:text-white"
+                  role="menuitem"
                 >
-                  {isHospital ? <Stethoscope size={16} className="text-emerald-400" /> : <LayoutDashboard size={16} className="text-blue-400" />}
+                  <span className="flex w-5 items-center justify-center">
+                    {isHospital ? <Stethoscope size={16} className="text-emerald-400" /> : <LayoutDashboard size={16} className="text-blue-400" />}
+                  </span>
                   {portalLabel}
                 </Link>
 
-                <Link
-                  href={settingsHref}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                >
-                  <Settings size={16} className="text-zinc-400" />
-                  Settings
-                </Link>
               </div>
 
-              <div className="pt-1 border-t border-white/5">
+              <div className="border-t border-white/10 pt-2">
                 <button
+                  type="button"
                   onClick={() => {
                     setIsOpen(false);
-                    signOut({ callbackUrl: "/sign-in" });
+                    signOut({ callbackUrl: "/" });
                   }}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer"
+                  className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-xs font-semibold text-rose-400 transition-all hover:bg-rose-500/10 cursor-pointer"
+                  role="menuitem"
                 >
-                  <LogOut size={16} />
+                  <span className="flex w-5 items-center justify-center">
+                    <LogOut size={16} />
+                  </span>
                   Sign Out
                 </button>
               </div>

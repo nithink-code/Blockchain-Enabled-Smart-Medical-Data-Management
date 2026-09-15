@@ -8,12 +8,11 @@ import {
   User, 
   Building2, 
   Stethoscope, 
-  Lock, 
+  Lock,
   Mail, 
   Eye, 
   EyeOff, 
   AlertCircle, 
-  CheckCircle2, 
   ShieldCheck,
   ArrowRight,
   Loader2
@@ -107,7 +106,7 @@ function SignInContent() {
   const accentColor = isHospital ? "emerald" : "blue";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4 sm:p-6 pt-28 selection:bg-blue-500/30">
+    <div className="flex min-h-screen items-center justify-center bg-black p-4 selection:bg-blue-500/30 sm:p-6">
       {/* Background ambient lighting */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div 
@@ -122,44 +121,42 @@ function SignInContent() {
         />
       </div>
 
-      <div className="relative w-full max-w-lg space-y-6">
-        {/* Header Branding */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center gap-2.5 mb-1">
-            <div className={`p-2.5 rounded-2xl shadow-xl transition-colors duration-500 ${
+      <div className="relative w-full max-w-lg">
+        {/* Main Form */}
+        <div className="relative top-6 mt-68 flex flex-col items-center gap-y-4 rounded-2xl border border-white/10 bg-zinc-950/80 p-6 pt-12 pb-12 shadow-2xl backdrop-blur-2xl sm:p-8 sm:pt-14 sm:pb-14">
+          <div className="mt-2 mb-9 flex flex-col items-center gap-4 text-center">
+            <div className={`relative top-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg shadow-xl transition-colors duration-500 ${
               isHospital ? "bg-emerald-600 shadow-emerald-500/20" : "bg-blue-600 shadow-blue-500/20"
             }`}>
-              {isHospital ? <Stethoscope className="h-6 w-6 text-white" /> : <ShieldCheck className="h-6 w-6 text-white" />}
+              {isHospital ? <Stethoscope className="h-5 w-5 text-white" /> : <ShieldCheck className="h-5 w-5 text-white" />}
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white">
-              Med<span className={isHospital ? "text-emerald-400" : "text-blue-500"}>Chain</span>
-            </span>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-white">
+                {isHospital ? "Hospital Portal Login" : "Patient Portal Login"}
+              </h1>
+              <p className="mt-2 text-xs leading-5 text-zinc-400">
+                {isHospital
+                  ? "Access your institutional medical workspace"
+                  : "Access your encrypted health records and consent"}
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            {isHospital ? "Hospital Portal Login" : "Patient Portal Login"}
-          </h1>
-          <p className="text-sm text-zinc-400">
-            {isHospital 
-              ? "Access verified institutional medical management workspace" 
-              : "Access your encrypted health records, AI diagnostics & consent"}
-          </p>
-        </div>
 
-        {/* Role Switcher Tabs */}
-        <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-zinc-950/80 border border-white/10 backdrop-blur-xl">
+          {/* Role Switcher Tabs */}
+          <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-2 rounded-xl border border-white/10 bg-white/3 p-1.5">
           <button
             type="button"
             onClick={() => {
               setActiveRole("user");
               setError("");
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-[11px] font-bold transition-all cursor-pointer ${
               !isHospital 
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.01]" 
                 : "text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <User size={16} />
+            <User size={14} />
             Patient / User
           </button>
 
@@ -169,59 +166,29 @@ function SignInContent() {
               setActiveRole("hospital");
               setError("");
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-[11px] font-bold transition-all cursor-pointer ${
               isHospital 
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 scale-[1.01]" 
                 : "text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Building2 size={16} />
+            <Building2 size={14} />
             Hospital / Doctor
           </button>
-        </div>
-
-        {/* Main Card */}
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/70 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-          
-          {/* Google One-Click Login */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={googleLoading || loading}
-            className="w-full flex items-center justify-center gap-3.5 h-13 rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-sm font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 cursor-pointer shadow-lg shadow-black/20"
-          >
-            {googleLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
-            ) : (
-              <GoogleIcon />
-            )}
-            <span>
-              Continue with Google as {isHospital ? "Hospital" : "Patient"}
-            </span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
-            <div className="relative px-4 bg-zinc-950/70 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-              Or with email & password
-            </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-medium text-rose-300 animate-in fade-in duration-200">
+            <div className="mx-auto mt-5 flex w-full max-w-sm items-start gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-[11px] font-medium text-rose-300 animate-in fade-in duration-200">
               <AlertCircle size={16} className="text-rose-400 shrink-0 mt-0.5" />
               <p className="leading-relaxed">{error}</p>
             </div>
           )}
 
           {/* Role Form */}
-          <form onSubmit={handleCredentialsLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-300">
+          <form onSubmit={handleCredentialsLogin} className="mx-auto w-full max-w-sm space-y-6">
+            <div className="space-y-2">
+              <label className="block text-[11px] font-semibold text-zinc-300">
                 {isHospital ? "Hospital / Institutional Email" : "Email Address"}
               </label>
               <div className="relative">
@@ -231,15 +198,16 @@ function SignInContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isHospital ? "apollo@medchain.io" : "user@example.com"}
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+                  style={{ textIndent: "40px" }}
+                  className="auth-input h-12 w-full rounded-xl border border-white/10 bg-white/3 px-4 pl-16 text-left text-xs text-white placeholder:text-zinc-600 transition-all focus:border-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                 />
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-zinc-300">Password</label>
+                <label className="block text-[11px] font-semibold text-zinc-300">Password</label>
               </div>
               <div className="relative">
                 <input
@@ -248,7 +216,8 @@ function SignInContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 pr-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+                  style={{ textIndent: "40px" }}
+                  className="auth-input h-12 w-full rounded-xl border border-white/10 bg-white/3 px-4 pl-12 pr-11 text-left text-xs text-white placeholder:text-zinc-600 transition-all focus:border-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                 />
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                 <button
@@ -265,7 +234,7 @@ function SignInContent() {
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className={`w-full flex items-center justify-center gap-2 h-13 rounded-2xl text-sm font-bold text-white shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 cursor-pointer ${
+              className={`relative left-20 top-2 mx-auto flex h-10 w-full max-w-60 items-center justify-center gap-2 rounded-xl text-xs font-bold text-white shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 ${
                 isHospital
                   ? "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20"
                   : "bg-blue-600 hover:bg-blue-500 shadow-blue-500/20"
@@ -285,21 +254,28 @@ function SignInContent() {
             </button>
           </form>
 
-          {/* Demo Credentials for Hospital */}
-          {isHospital && (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 space-y-1.5 text-xs">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
-                <CheckCircle2 size={12} /> Pre-configured Hospital Demo
-              </p>
-              <div className="font-mono text-zinc-400 flex flex-wrap gap-x-4 text-[11px]">
-                <span>Email: <strong className="text-zinc-200">apollo@medchain.io</strong></span>
-                <span>Password: <strong className="text-zinc-200">hospital123</strong></span>
-              </div>
-            </div>
-          )}
+          {/* Google One-Click Login */}
+          <div className="mx-auto flex w-full max-w-sm items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">or</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading || loading}
+            className="mx-auto flex h-11 w-full max-w-70 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/4 px-4 text-xs font-semibold text-white transition-all hover:border-white/20 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+            ) : (
+              <GoogleIcon />
+            )}
+            <span>Continue with Google</span>
+          </button>
 
           {/* Footer switch to sign-up */}
-          <div className="pt-2 text-center text-xs text-zinc-400">
+          <div className="mt-6 border-t border-white/10 pt-5 text-center text-xs text-zinc-400">
             Don&apos;t have an account?{" "}
             <Link
               href={`/sign-up?role=${activeRole}`}

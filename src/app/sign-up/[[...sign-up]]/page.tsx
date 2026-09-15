@@ -8,16 +8,12 @@ import {
   User, 
   Building2, 
   Stethoscope, 
-  Lock, 
-  Mail, 
   Eye, 
   EyeOff, 
   AlertCircle, 
   ShieldCheck,
   ArrowRight,
-  Loader2,
-  FileCheck2,
-  Phone
+  Loader2
 } from "lucide-react";
 
 function GoogleIcon() {
@@ -144,7 +140,7 @@ function SignUpContent() {
   const isHospital = activeRole === "hospital";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4 sm:p-6 pt-28 selection:bg-blue-500/30">
+    <div className="flex min-h-screen items-center justify-center bg-black p-4 selection:bg-blue-500/30 sm:p-6">
       {/* Background ambient lighting */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div 
@@ -159,44 +155,42 @@ function SignUpContent() {
         />
       </div>
 
-      <div className="relative w-full max-w-lg space-y-6">
-        {/* Header Branding */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center gap-2.5 mb-1">
-            <div className={`p-2.5 rounded-2xl shadow-xl transition-colors duration-500 ${
+      <div className="relative w-full max-w-lg">
+        {/* Main Form */}
+        <div className="relative top-6 flex flex-col items-center gap-y-4 rounded-2xl border border-white/10 bg-zinc-950/80 p-6 pt-12 pb-12 shadow-2xl backdrop-blur-2xl sm:p-8 sm:pt-14 sm:pb-14">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className={`flex h-10 w-10 items-center justify-center rounded-lg shadow-xl transition-colors duration-500 ${
               isHospital ? "bg-emerald-600 shadow-emerald-500/20" : "bg-blue-600 shadow-blue-500/20"
             }`}>
-              {isHospital ? <Stethoscope className="h-6 w-6 text-white" /> : <ShieldCheck className="h-6 w-6 text-white" />}
+              {isHospital ? <Stethoscope className="h-5 w-5 text-white" /> : <ShieldCheck className="h-5 w-5 text-white" />}
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white">
-              Med<span className={isHospital ? "text-emerald-400" : "text-blue-500"}>Chain</span>
-            </span>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-white">
+                {isHospital ? "Create Hospital Account" : "Create Patient Account"}
+              </h1>
+              <p className="mt-2 text-xs leading-5 text-zinc-400">
+                {isHospital
+                  ? "Join as a verified healthcare provider"
+                  : "Register your secure patient identity"}
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            {isHospital ? "Create Hospital Account" : "Create Patient Account"}
-          </h1>
-          <p className="text-sm text-zinc-400">
-            {isHospital 
-              ? "Join the blockchain medical network as a verified healthcare provider" 
-              : "Register your patient identity for sovereign encrypted records"}
-          </p>
-        </div>
 
-        {/* Role Switcher Tabs */}
-        <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-zinc-950/80 border border-white/10 backdrop-blur-xl">
+          {/* Role Switcher Tabs */}
+          <div className="grid w-full max-w-sm grid-cols-2 gap-2 rounded-xl border border-white/10 bg-white/3 p-1.5">
           <button
             type="button"
             onClick={() => {
               setActiveRole("user");
               setError("");
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-[11px] font-bold transition-all cursor-pointer ${
               !isHospital 
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.01]" 
                 : "text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <User size={16} />
+            <User size={14} />
             Patient / User
           </button>
 
@@ -206,107 +200,99 @@ function SignUpContent() {
               setActiveRole("hospital");
               setError("");
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-[11px] font-bold transition-all cursor-pointer ${
               isHospital 
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 scale-[1.01]" 
                 : "text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Building2 size={16} />
+            <Building2 size={14} />
             Hospital / Doctor
           </button>
-        </div>
-
-        {/* Main Card */}
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/70 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-          
-          {/* Google One-Click Register */}
-          <button
-            type="button"
-            onClick={handleGoogleSignUp}
-            disabled={googleLoading || loading}
-            className="w-full flex items-center justify-center gap-3.5 h-13 rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-sm font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 cursor-pointer shadow-lg shadow-black/20"
-          >
-            {googleLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
-            ) : (
-              <GoogleIcon />
-            )}
-            <span>
-              Sign Up with Google as {isHospital ? "Hospital" : "Patient"}
-            </span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
-            <div className="relative px-4 bg-zinc-950/70 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-              Or register with details
-            </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-medium text-rose-300 animate-in fade-in duration-200">
+            <div className="w-full max-w-sm flex items-start gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-[11px] font-medium text-rose-300 animate-in fade-in duration-200">
               <AlertCircle size={16} className="text-rose-400 shrink-0 mt-0.5" />
               <p className="leading-relaxed">{error}</p>
             </div>
           )}
 
           {/* Role-Specific Form */}
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="w-full max-w-sm space-y-6">
             {isHospital ? (
               <>
-                {/* Hospital Name */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-zinc-300">Hospital / Facility Name</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={hospitalName}
-                      onChange={(e) => setHospitalName(e.target.value)}
-                      placeholder="e.g. Apollo Memorial Hospital"
-                      required
-                      className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 transition-all"
-                    />
-                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {/* Hospital Name */}
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-300">Hospital / Facility Name</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={hospitalName}
+                        onChange={(e) => setHospitalName(e.target.value)}
+                        placeholder="e.g. Apollo Memorial Hospital"
+                        required
+                        style={{ textIndent: "20px" }}
+                        className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 pl-14 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* License Number */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-zinc-300">License Number</label>
+                  {/* License Number */}
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-300">License Number</label>
                     <div className="relative">
                       <input
                         type="text"
                         value={licenseNumber}
                         onChange={(e) => setLicenseNumber(e.target.value)}
                         placeholder="MED-LIC-2026-X"
-                        className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all"
+                        style={{ textIndent: "20px" }}
+                        className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 pl-14 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                       />
-                      <FileCheck2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-zinc-300">Primary Speciality</label>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {/* Primary Speciality */}
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-300">Primary Speciality</label>
                     <input
                       type="text"
                       value={speciality}
                       onChange={(e) => setSpeciality(e.target.value)}
                       placeholder="General Medicine / Oncology"
-                      className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all"
+                      style={{ textIndent: "20px" }}
+                      className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                     />
+                  </div>
+
+                  {/* Institutional Email */}
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-300">Institutional Email</label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="admin@hospital.org"
+                        required
+                        style={{ textIndent: "20px" }}
+                        className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 pl-14 text-left text-xs text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      />
+                    </div>
                   </div>
                 </div>
               </>
             ) : (
               <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* Full Name */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-zinc-300">Full Name</label>
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold text-zinc-300">Full Name</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -314,33 +300,34 @@ function SignUpContent() {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jane Doe"
                       required
-                      className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+                      style={{ textIndent: "12px" }}
+                      className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:border-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                     />
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                   </div>
                 </div>
 
                 {/* Optional Phone */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-zinc-300">Phone (Optional)</label>
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold text-zinc-300">Phone (Optional)</label>
                   <div className="relative">
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+1 (555) 000-0000"
-                      className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
+                      style={{ textIndent: "12px" }}
+                      className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                     />
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                   </div>
+                </div>
                 </div>
               </>
             )}
 
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-300">
-                {isHospital ? "Institutional Email" : "Email Address"}
+            {/* Patient Email */}
+            {!isHospital && <div className="space-y-2">
+              <label className="block text-[11px] font-semibold text-zinc-300">
+                Email Address
               </label>
               <div className="relative">
                 <input
@@ -349,15 +336,15 @@ function SignUpContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isHospital ? "admin@hospital.org" : "jane@example.com"}
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+                  style={{ textIndent: "12px" }}
+                  className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:border-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                 />
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
               </div>
-            </div>
+            </div>}
 
             {/* Password */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-300">Password</label>
+            <div className="space-y-2">
+              <label className="block text-[11px] font-semibold text-zinc-300">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -366,9 +353,9 @@ function SignUpContent() {
                   placeholder="Minimum 6 characters"
                   required
                   minLength={6}
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 pl-11 pr-11 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+                  style={{ textIndent: "12px" }}
+                  className="auth-input h-10 w-full rounded-xl border border-white/10 bg-white/3 px-4 pr-11 text-left text-[11px] text-white placeholder:text-zinc-600 transition-all focus:border-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                 />
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -383,7 +370,7 @@ function SignUpContent() {
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className={`w-full flex items-center justify-center gap-2 h-13 rounded-2xl text-sm font-bold text-white shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 cursor-pointer ${
+              className={`relative left-12 top-2 mx-auto flex h-10 w-full max-w-60 items-center justify-center gap-2 rounded-xl text-xs font-bold text-white shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 ${
                 isHospital
                   ? "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20"
                   : "bg-blue-600 hover:bg-blue-500 shadow-blue-500/20"
@@ -403,8 +390,28 @@ function SignUpContent() {
             </button>
           </form>
 
+          {/* Google One-Click Register */}
+          <div className="flex w-full max-w-sm items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">or</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+          <button
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={googleLoading || loading}
+            className="mx-auto flex h-11 w-full max-w-60 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/4 px-4 text-xs font-semibold text-white transition-all hover:border-white/20 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+            ) : (
+              <GoogleIcon />
+            )}
+            <span>Continue with Google</span>
+          </button>
+
           {/* Footer switch to sign-in */}
-          <div className="pt-2 text-center text-xs text-zinc-400">
+          <div className="w-full border-t border-white/10 pt-5 text-center text-xs text-zinc-400">
             Already have an account?{" "}
             <Link
               href={`/sign-in?role=${activeRole}`}

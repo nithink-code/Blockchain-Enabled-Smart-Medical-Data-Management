@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { showToast } from "./toast";
 
 const STORAGE_KEY = "medchain:auth-toast-state";
 
 export function AuthToastWatcher() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { status } = useSession();
+  const isLoaded = status !== "loading";
+  const isSignedIn = status === "authenticated";
 
   useEffect(() => {
     if (!isLoaded) return;

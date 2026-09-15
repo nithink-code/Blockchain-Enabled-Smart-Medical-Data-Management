@@ -17,8 +17,7 @@ export default function GlobalError({
 
   const isNetworkError = 
     error.message.toLowerCase().includes("network") || 
-    error.message.toLowerCase().includes("fetch") ||
-    error.message.toLowerCase().includes("clerkjs: network error");
+    error.message.toLowerCase().includes("fetch");
 
   return (
     <html lang="en">

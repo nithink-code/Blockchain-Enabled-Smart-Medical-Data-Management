@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongodb";
-import User from "@/lib/models/User";
+import User, { isUserRole } from "@/lib/models/User";
 import AccessRequest from "@/lib/models/AccessRequest";
 
 const ALLOWED_STATUSES = ["approved", "denied", "expired"];
@@ -14,18 +14,18 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth();
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   await connectDB();
-  const user = await User.findOne({ clerkId: userId }).lean();
+  const user = await User.findOne({ email: session.user.email.toLowerCase().trim() }).lean();
   if (!user) {
     return NextResponse.json({ error: "User not found in DB" }, { status: 404 });
   }
-  if (user.role !== "patient") {
-    return NextResponse.json({ error: "Only patients can update access requests" }, { status: 403 });
+  if (!isUserRole(user.role)) {
+    return NextResponse.json({ error: "Only patients/users can update access requests" }, { status: 403 });
   }
 
   const { id } = await params;
@@ -41,8 +41,11 @@ export async function PATCH(
     return NextResponse.json({ error: "Access request not found" }, { status: 404 });
   }
 
+  const userIdStr = (user as any)._id?.toString();
   existing.status = status;
-  existing.patientClerkId = existing.patientClerkId ?? userId;
+  existing.patientId = existing.patientId ?? userIdStr;
+  existing.patientEmail = existing.patientEmail ?? user.email;
+  existing.patientClerkId = existing.patientClerkId ?? userIdStr;
 
   if (status === "approved") {
     const hours = parseInt(existing.requestedDuration) || 24;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Loader2, LogOut, Shield, Stethoscope } from "lucide-react";
 import { useUserRole } from "@/lib/use-user-role";
 
@@ -43,7 +44,7 @@ export default function HospitalLayout({
   }, [isLoaded, isSignedIn, role, roleKnown, isCheckingRole, router]);
 
   function handleSignOut() {
-    window.location.href = "/sign-in";
+    signOut({ callbackUrl: "/sign-in" });
   }
 
   if (loading) {

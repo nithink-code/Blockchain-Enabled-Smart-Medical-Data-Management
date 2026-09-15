@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: major-project
+  - name: major-project
     runtime: node
     plan: free
     buildCommand: npm install && npm run build
@@ -13,26 +13,16 @@ services:
         value: 1
       - key: GENERATE_SOURCEMAP
         value: false
-      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+      - key: AUTH_SECRET
         sync: false
-      - key: CLERK_SECRET_KEY
+      - key: NEXTAUTH_SECRET
         sync: false
-      - key: NEXT_PUBLIC_CLERK_SIGN_IN_URL
-        value: /sign-in
-      - key: NEXT_PUBLIC_CLERK_SIGN_UP_URL
-        value: /sign-up
-      - key: NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL
-        value: /dashboard
-      - key: NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL
-        value: /dashboard
-      - key: NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL
-        value: /dashboard
-      - key: NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL
-        value: /dashboard
-      - key: NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
-        value: /dashboard
-      - key: NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
-        value: /dashboard
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
       - key: MONGODB_URI
         sync: false
       - key: OPENROUTER_API_KEY

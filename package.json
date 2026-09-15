@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.2.2",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
@@ -17,6 +16,7 @@
     "lucide-react": "^1.8.0",
     "mongoose": "^9.5.0",
     "next": "16.2.3",
+    "next-auth": "^5.0.0-beta.32",
     "pdf-parse": "^2.4.5",
     "plotly.js": "^3.5.0",
     "plotly.js-dist-min": "^3.5.0",

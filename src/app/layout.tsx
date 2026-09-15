@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { PageLoader } from "@/components/page-loader";
 import { ToastContainer } from "@/components/toast";
 import { AuthToastWatcher } from "@/components/auth-toast-watcher";
+import { SessionProvider } from "@/components/providers/session-provider";
 import { Suspense } from "react";
-
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -25,12 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${manrope.className} min-h-screen bg-black text-white antialiased`}>
-        <ClerkProvider
-          signInForceRedirectUrl="/dashboard"
-          signUpForceRedirectUrl="/dashboard"
-          signInFallbackRedirectUrl="/dashboard"
-          signUpFallbackRedirectUrl="/dashboard"
-        >
+        <SessionProvider>
           <Suspense fallback={null}>
             <PageLoader />
           </Suspense>
@@ -39,8 +33,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
-
-        </ClerkProvider>
+        </SessionProvider>
       </body>
     </html>
   );

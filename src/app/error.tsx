@@ -18,8 +18,7 @@ export default function ErrorBoundary({
 
   const isNetworkError = 
     error.message.toLowerCase().includes("network") || 
-    error.message.toLowerCase().includes("fetch") ||
-    error.message.toLowerCase().includes("clerkjs: network error");
+    error.message.toLowerCase().includes("fetch");
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8 bg-black text-white relative overflow-hidden">

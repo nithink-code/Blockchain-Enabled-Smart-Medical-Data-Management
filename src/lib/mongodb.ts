@@ -1,5 +1,5 @@
-import dns from "node:dns"
-dns.setServers(['8.8.8.8','4.4.4.4'])
+// import dns from "node:dns"
+// dns.setServers(['8.8.8.8','4.4.4.4'])
 
 import mongoose from "mongoose";
 

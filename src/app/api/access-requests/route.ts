@@ -1,26 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongodb";
-import User from "@/lib/models/User";
+import User, { isHospitalRole } from "@/lib/models/User";
 import AccessRequest from "@/lib/models/AccessRequest";
 
 /**
  * GET /api/access-requests
- * Doctors get the requests they created; patients get all pending/decided requests.
+ * Hospitals/doctors get the requests they created; patients get all pending/decided requests.
  */
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth();
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   await connectDB();
-  const user = await User.findOne({ clerkId: userId }).lean();
+  const user = await User.findOne({ email: session.user.email.toLowerCase().trim() }).lean();
   if (!user) {
     return NextResponse.json({ error: "User not found in DB" }, { status: 404 });
   }
 
-  const query = user.role === "doctor" ? { doctorClerkId: userId } : {};
+  const userIdStr = (user as any)._id?.toString();
+  const query = isHospitalRole(user.role)
+    ? {
+        $or: [
+          { doctorEmail: user.email },
+          { doctorId: userIdStr },
+          { doctorClerkId: userIdStr },
+        ],
+      }
+    : {};
+
   const requests = await AccessRequest.find(query).sort({ createdAt: -1 }).lean();
 
   return NextResponse.json({ requests });
@@ -28,21 +38,21 @@ export async function GET() {
 
 /**
  * POST /api/access-requests
- * Doctor requests access to a patient record.
+ * Doctor / Hospital requests access to a patient record.
  */
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth();
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   await connectDB();
-  const user = await User.findOne({ clerkId: userId }).lean();
+  const user = await User.findOne({ email: session.user.email.toLowerCase().trim() }).lean();
   if (!user) {
     return NextResponse.json({ error: "User not found in DB" }, { status: 404 });
   }
-  if (user.role !== "doctor") {
-    return NextResponse.json({ error: "Only doctors can request access" }, { status: 403 });
+  if (!isHospitalRole(user.role)) {
+    return NextResponse.json({ error: "Only hospitals/doctors can request access" }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);
@@ -61,14 +71,20 @@ export async function POST(request: NextRequest) {
     reason,
   } = body;
 
-  if (!recordId || !patientName || !reportTitle || !hospitalName || !reason) {
+  if (!recordId || !patientName || !reportTitle || !reason) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  const effectiveHospital = hospitalName?.trim() || user.hospitalName || "Hospital Facility";
+  const userIdStr = (user as any)._id?.toString();
+
   const created = await AccessRequest.create({
-    doctorClerkId: userId,
-    doctorName: user.name || "Doctor",
-    hospitalName: String(hospitalName).trim(),
+    doctorId: userIdStr,
+    doctorClerkId: userIdStr,
+    doctorEmail: user.email,
+    doctorName: user.name || effectiveHospital,
+    hospitalName: effectiveHospital,
+    speciality: user.speciality || "General Medicine",
     patientName,
     patientInfo: patientInfo ?? "",
     recordId,

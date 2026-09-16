@@ -69,6 +69,12 @@ export async function POST(request: NextRequest) {
     reportType,
     hospitalName,
     reason,
+    requestedDuration,
+    durationInSeconds,
+    blockchainRequestId,
+    txHash,
+    patientWalletAddress,
+    hospitalWalletAddress,
   } = body;
 
   if (!recordId || !patientName || !reportTitle || !reason) {
@@ -92,6 +98,12 @@ export async function POST(request: NextRequest) {
     reportTitle,
     reportType: reportType ?? "Report",
     reason: String(reason).trim(),
+    requestedDuration: requestedDuration ?? "24 hours",
+    durationInSeconds: typeof durationInSeconds === "number" ? durationInSeconds : undefined,
+    blockchainRequestId: typeof blockchainRequestId === "number" ? blockchainRequestId : undefined,
+    txHash: txHash ? String(txHash) : undefined,
+    patientWalletAddress: patientWalletAddress ? String(patientWalletAddress) : undefined,
+    hospitalWalletAddress: hospitalWalletAddress ? String(hospitalWalletAddress) : undefined,
     status: "pending",
   });
 

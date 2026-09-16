@@ -19,6 +19,13 @@ import {
   type AccessRequest,
 } from "@/lib/access-requests";
 
+import {
+  callContractApproveAccess,
+  callContractRejectAccess,
+  callContractRevokeAccess,
+  isWalletAvailable,
+} from "@/lib/web3";
+
 const ACCESS_REQUESTS_POLL_MS = 8000;
 
 function formatRequestedAt(value: string) {
@@ -35,6 +42,7 @@ function formatRequestedAt(value: string) {
 export default function ConsentPage() {
   const [requests, setRequests] = useState<AccessRequest[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [isProcessingTx, setIsProcessingTx] = useState(false);
 
   function dismiss(id: string) {
     setDismissedIds((prev) => new Set(prev).add(id));
@@ -62,6 +70,24 @@ export default function ConsentPage() {
   }, []);
 
   async function applyStatus(id: string, status: "approved" | "denied" | "expired") {
+    const targetReq = requests.find((r) => r.id === id);
+    if (targetReq?.blockchainRequestId && isWalletAvailable()) {
+      try {
+        setIsProcessingTx(true);
+        if (status === "approved") {
+          await callContractApproveAccess(targetReq.blockchainRequestId);
+        } else if (status === "denied") {
+          await callContractRejectAccess(targetReq.blockchainRequestId);
+        } else if (status === "expired") {
+          await callContractRevokeAccess(targetReq.blockchainRequestId);
+        }
+      } catch (err: any) {
+        console.warn("Smart contract call warning:", err);
+      } finally {
+        setIsProcessingTx(false);
+      }
+    }
+
     const updated = await updateAccessRequestStatus(id, status);
     if (!updated) return;
     setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
@@ -225,6 +251,13 @@ function RequestCard({ req, onApprove, onDeny, onDismiss }: {
           <span className="flex items-center gap-2"><Calendar size={14} className="text-zinc-600" /> {req.requestedDuration} session</span>
         </div>
 
+        {req.txHash && (
+          <div className="ml-14! flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-[11px] font-mono text-emerald-400">
+            <CheckCircle2 size={12} className="shrink-0" />
+            <span className="truncate">On-Chain Req #{req.blockchainRequestId ?? 1}: {req.txHash.slice(0, 10)}...</span>
+          </div>
+        )}
+
         {/* Info rows */}
         <div className="space-y-6! pl-14!">
           <InfoRow
@@ -294,6 +327,13 @@ function ActiveAccessCard({ req, onRevoke, onDismiss }: { req: AccessRequest; on
           <span className="flex items-center gap-2"><Clock size={14} className="text-zinc-600" /> {formatRequestedAt(req.requestedAt)}</span>
           <span className="flex items-center gap-2"><Calendar size={14} className="text-zinc-600" /> {req.requestedDuration} session</span>
         </div>
+
+        {req.txHash && (
+          <div className="ml-14! flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-[11px] font-mono text-emerald-400">
+            <CheckCircle2 size={12} className="shrink-0" />
+            <span className="truncate">On-Chain Req #{req.blockchainRequestId ?? 1}: {req.txHash.slice(0, 10)}...</span>
+          </div>
+        )}
 
         {/* Info rows */}
         <div className="space-y-6! pl-14!">

@@ -20,6 +20,11 @@ export interface IAccessRequest {
   reportType: string;
   reason: string;
   requestedDuration: string;
+  blockchainRequestId?: number;
+  txHash?: string;
+  patientWalletAddress?: string;
+  hospitalWalletAddress?: string;
+  durationInSeconds?: number;
   status: AccessRequestStatus;
   approvedAt?: Date;
   expiresAt?: Date;
@@ -29,26 +34,31 @@ export interface IAccessRequest {
 
 const AccessRequestSchema = new Schema<IAccessRequest>(
   {
-    doctorId:          { type: String, index: true },
-    doctorClerkId:     { type: String, index: true },
-    doctorEmail:       { type: String, index: true },
-    doctorName:        { type: String, required: true },
-    hospitalName:      { type: String, required: true },
-    speciality:        { type: String, default: "General Medicine" },
-    patientId:         { type: String, index: true },
-    patientClerkId:    { type: String, index: true },
-    patientEmail:      { type: String, index: true },
-    patientName:       { type: String, required: true },
-    patientInfo:       { type: String, default: "" },
-    recordId:          { type: String, required: true, index: true },
-    cid:               { type: String, default: "Pending" },
-    reportTitle:       { type: String, required: true },
-    reportType:        { type: String, default: "Report" },
-    reason:            { type: String, default: "" },
-    requestedDuration: { type: String, default: "24 hours" },
-    status:            { type: String, enum: ["pending", "approved", "denied", "expired"], default: "pending", index: true },
-    approvedAt:        { type: Date },
-    expiresAt:         { type: Date },
+    doctorId:              { type: String, index: true },
+    doctorClerkId:         { type: String, index: true },
+    doctorEmail:           { type: String, index: true },
+    doctorName:            { type: String, required: true },
+    hospitalName:          { type: String, required: true },
+    speciality:            { type: String, default: "General Medicine" },
+    patientId:             { type: String, index: true },
+    patientClerkId:        { type: String, index: true },
+    patientEmail:          { type: String, index: true },
+    patientName:           { type: String, required: true },
+    patientInfo:           { type: String, default: "" },
+    recordId:              { type: String, required: true, index: true },
+    cid:                   { type: String, default: "Pending" },
+    reportTitle:           { type: String, required: true },
+    reportType:            { type: String, default: "Report" },
+    reason:                { type: String, default: "" },
+    requestedDuration:     { type: String, default: "24 hours" },
+    durationInSeconds:     { type: Number },
+    blockchainRequestId:   { type: Number, index: true },
+    txHash:                { type: String },
+    patientWalletAddress:  { type: String },
+    hospitalWalletAddress: { type: String },
+    status:                { type: String, enum: ["pending", "approved", "denied", "expired"], default: "pending", index: true },
+    approvedAt:            { type: Date },
+    expiresAt:             { type: Date },
   },
   { timestamps: true }
 );

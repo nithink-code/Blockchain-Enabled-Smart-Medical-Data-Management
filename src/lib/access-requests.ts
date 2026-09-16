@@ -13,6 +13,11 @@ export interface AccessRequest {
   speciality: string;
   reason: string;
   requestedDuration: string;
+  durationInSeconds?: number;
+  blockchainRequestId?: number;
+  txHash?: string;
+  patientWalletAddress?: string;
+  hospitalWalletAddress?: string;
   requestedAt: string;
   status: AccessRequestStatus;
   approvedAt?: string;
@@ -28,6 +33,12 @@ export interface NewAccessRequestInput {
   reportType: string;
   hospitalName: string;
   reason: string;
+  requestedDuration?: string;
+  durationInSeconds?: number;
+  blockchainRequestId?: number;
+  txHash?: string;
+  patientWalletAddress?: string;
+  hospitalWalletAddress?: string;
 }
 
 const EVENT_NAME = "medchain:access-requests-updated";
@@ -51,6 +62,11 @@ function normalizeRequest(raw: Record<string, unknown>): AccessRequest {
     speciality: String(raw.speciality ?? "General Medicine"),
     reason: String(raw.reason ?? ""),
     requestedDuration: String(raw.requestedDuration ?? "24 hours"),
+    durationInSeconds: typeof raw.durationInSeconds === "number" ? raw.durationInSeconds : undefined,
+    blockchainRequestId: typeof raw.blockchainRequestId === "number" ? raw.blockchainRequestId : undefined,
+    txHash: typeof raw.txHash === "string" ? raw.txHash : undefined,
+    patientWalletAddress: typeof raw.patientWalletAddress === "string" ? raw.patientWalletAddress : undefined,
+    hospitalWalletAddress: typeof raw.hospitalWalletAddress === "string" ? raw.hospitalWalletAddress : undefined,
     requestedAt: String(raw.createdAt ?? raw.requestedAt ?? new Date().toISOString()),
     status,
     approvedAt: typeof raw.approvedAt === "string" ? raw.approvedAt : undefined,

@@ -1,7 +1,8 @@
-import dns from "node:dns"
-dns.setServers(['8.8.8.8','4.4.4.4'])
-
+import dns from "dns";
 import mongoose from "mongoose";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+dns.setDefaultResultOrder('ipv4first')
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
@@ -9,12 +10,10 @@ if (!MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable in .env.local");
 }
 
-// Cached connection to avoid reconnecting on every hot-reload in dev
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let cached = (global as any).__mongoose_cache;
 
 if (!cached) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cached = (global as any).__mongoose_cache = { conn: null, promise: null };
 }
 
@@ -24,7 +23,7 @@ export async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 10000, // 10s timeout
+      serverSelectionTimeoutMS: 10000, 
     };
 
     console.log("Connecting to MongoDB Atlas...");
@@ -38,7 +37,11 @@ export async function connectDB() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    console.error("MongoDB connection error:", e);
+    const message = e instanceof Error ? e.message : String(e);
+    console.error(
+      "MongoDB connection error. Check Atlas network access, the connection string, and local DNS:",
+      message
+    );
     throw e;
   }
 

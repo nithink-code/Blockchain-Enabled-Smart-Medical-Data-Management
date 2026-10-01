@@ -121,19 +121,65 @@ export async function callContractRequestAccess({
   }
 
   const provider = getBrowserProvider()!;
+  const network = await provider.getNetwork();
+  const deployedCode = await provider.getCode(CONTRACT_ADDRESS);
+  if (deployedCode === "0x") {
+    throw new Error(
+      `No smart contract was found at ${CONTRACT_ADDRESS} on chain ${network.chainId.toString()}. ` +
+        "Switch MetaMask to the network where TimeBasedHealthAccess was deployed, or update NEXT_PUBLIC_HEALTH_ACCESS_CONTRACT_ADDRESS."
+    );
+  }
+
   const signer = await provider.getSigner();
   const hospitalAddress = await signer.getAddress();
 
   const contract = getHealthAccessContract(signer);
 
+  try {
+    const requestIds = await contract.getPatientRequests(patientAddress);
+    for (const requestId of requestIds) {
+      const existing = await contract.requests(requestId);
+      const isSameHospital = existing.hospital.toLowerCase() === hospitalAddress.toLowerCase();
+      const isSamePatient = existing.patient.toLowerCase() === patientAddress.toLowerCase();
+      const isPending = Number(existing.status) === 0;
+
+      if (isSameHospital && isSamePatient && isPending) {
+        throw new Error(
+          `A pending access request already exists for this patient (on-chain request #${requestId.toString()}). ` +
+            "Wait for the patient to approve or reject it before requesting access again."
+        );
+      }
+    }
+  } catch (error: any) {
+    if (error instanceof Error && error.message.startsWith("A pending access request")) {
+      throw error;
+    }
+    throw new Error(
+      `The contract at ${CONTRACT_ADDRESS} on chain ${network.chainId.toString()} is not compatible with the deployed TimeBasedHealthAccess ABI. ` +
+        "Its getPatientRequests call reverted. Redeploy the matching contract and set NEXT_PUBLIC_HEALTH_ACCESS_CONTRACT_ADDRESS to its address."
+    );
+  }
+
   onStatusChange?.("prompting");
 
   // Call requestAccess
-  const tx = await contract.requestAccess(
-    patientAddress,
-    recordHash.trim(),
-    BigInt(durationInSeconds)
-  );
+  let tx: ethers.TransactionResponse;
+  try {
+    tx = await contract.requestAccess(
+      patientAddress,
+      recordHash.trim(),
+      BigInt(durationInSeconds)
+    );
+  } catch (error: any) {
+    if (error?.code === "CALL_EXCEPTION" && !error?.reason && !error?.revert) {
+      throw new Error(
+        `The contract rejected requestAccess on chain ${network.chainId.toString()}. ` +
+          "The patient may already have a pending request, the request may be otherwise invalid, " +
+          "or this address may contain an incompatible contract. Verify the deployed ABI and contract state."
+      );
+    }
+    throw error;
+  }
 
   onStatusChange?.("pending");
 

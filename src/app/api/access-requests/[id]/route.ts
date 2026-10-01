@@ -48,9 +48,17 @@ export async function PATCH(
   existing.patientClerkId = existing.patientClerkId ?? userIdStr;
 
   if (status === "approved") {
-    const hours = parseInt(existing.requestedDuration) || 24;
     existing.approvedAt = new Date();
-    existing.expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+    // Use durationInSeconds from the request (set by the hospital at request time)
+    // Fall back to parsing the duration label, then default to 24 hours
+    let durationSec: number;
+    if (typeof existing.durationInSeconds === "number" && existing.durationInSeconds > 0) {
+      durationSec = existing.durationInSeconds;
+    } else {
+      const parsed = parseInt(existing.requestedDuration);
+      durationSec = Number.isNaN(parsed) || parsed <= 0 ? 86400 : parsed * 3600;
+    }
+    existing.expiresAt = new Date(Date.now() + durationSec * 1000);
   }
   if (status === "expired") {
     existing.expiresAt = undefined;

@@ -22,6 +22,8 @@ export interface AccessRequest {
   status: AccessRequestStatus;
   approvedAt?: string;
   expiresAt?: string;
+  createdAt?: string;
+  isExpired?: boolean;
 }
 
 export interface NewAccessRequestInput {
@@ -71,6 +73,10 @@ function normalizeRequest(raw: Record<string, unknown>): AccessRequest {
     status,
     approvedAt: typeof raw.approvedAt === "string" ? raw.approvedAt : undefined,
     expiresAt: typeof raw.expiresAt === "string" ? raw.expiresAt : undefined,
+    isExpired:
+      status === "approved" && typeof raw.expiresAt === "string"
+        ? new Date(raw.expiresAt).getTime() < Date.now()
+        : false,
   };
 }
 

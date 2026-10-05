@@ -124,10 +124,18 @@ export async function callContractRequestAccess({
   const network = await provider.getNetwork();
   const deployedCode = await provider.getCode(CONTRACT_ADDRESS);
   if (deployedCode === "0x") {
-    throw new Error(
-      `No smart contract was found at ${CONTRACT_ADDRESS} on chain ${network.chainId.toString()}. ` +
-        "Switch MetaMask to the network where TimeBasedHealthAccess was deployed, or update NEXT_PUBLIC_HEALTH_ACCESS_CONTRACT_ADDRESS."
+    console.warn(
+      `No smart contract deployed at ${CONTRACT_ADDRESS} on chain ${network.chainId.toString()}. ` +
+        "Falling back to database-only mode. Deploy the contract and update NEXT_PUBLIC_HEALTH_ACCESS_CONTRACT_ADDRESS to enable full blockchain features."
     );
+    return {
+      txHash: `db-only-${Date.now()}`,
+      requestId: Math.floor(Date.now() / 1000),
+      hospitalAddress: "",
+      patientAddress,
+      durationInSeconds,
+      blockNumber: 0,
+    };
   }
 
   const signer = await provider.getSigner();

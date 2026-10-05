@@ -72,28 +72,38 @@ export default function ConsentPage() {
   async function applyStatus(id: string, status: "approved" | "denied" | "expired") {
     const targetReq = requests.find((r) => r.id === id);
 
-    if (targetReq?.blockchainRequestId && isWalletAvailable()) {
+    // Use explicit check so blockchainRequestId === 0 is not treated as falsy
+    const hasBlockchainId =
+      targetReq?.blockchainRequestId !== undefined &&
+      targetReq?.blockchainRequestId !== null;
+
+    if (hasBlockchainId) {
+      if (!isWalletAvailable()) {
+        alert("Please connect your Web3 wallet (MetaMask) to approve access on-chain.");
+        return;
+      }
+
       try {
         setIsProcessingTx(true);
 
         if (status === "approved") {
-          await callContractApproveAccess(targetReq.blockchainRequestId);
+          await callContractApproveAccess(targetReq.blockchainRequestId!);
         } else if (status === "denied") {
-          // Use Reject for pending requests
-          await callContractRejectAccess(targetReq.blockchainRequestId);
+          await callContractRejectAccess(targetReq.blockchainRequestId!);
         } else if (status === "expired") {
-          // If contract requires req.status == Approved, ensure it was approved first
-          await callContractRevokeAccess(targetReq.blockchainRequestId);
+          await callContractRevokeAccess(targetReq.blockchainRequestId!);
         }
       } catch (err: any) {
         console.error("Smart contract execution failed:", err);
+        // Optional: Add toast error notification here
         setIsProcessingTx(false);
-        return;
+        return; // Stop state update if Web3 transaction failed or was rejected by user
       } finally {
         setIsProcessingTx(false);
       }
     }
 
+    // Update local storage / backend database status
     const updated = await updateAccessRequestStatus(id, status);
     if (!updated) return;
     setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));

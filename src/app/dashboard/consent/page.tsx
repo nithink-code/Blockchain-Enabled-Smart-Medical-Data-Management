@@ -71,18 +71,24 @@ export default function ConsentPage() {
 
   async function applyStatus(id: string, status: "approved" | "denied" | "expired") {
     const targetReq = requests.find((r) => r.id === id);
+
     if (targetReq?.blockchainRequestId && isWalletAvailable()) {
       try {
         setIsProcessingTx(true);
+
         if (status === "approved") {
           await callContractApproveAccess(targetReq.blockchainRequestId);
         } else if (status === "denied") {
+          // Use Reject for pending requests
           await callContractRejectAccess(targetReq.blockchainRequestId);
         } else if (status === "expired") {
+          // If contract requires req.status == Approved, ensure it was approved first
           await callContractRevokeAccess(targetReq.blockchainRequestId);
         }
       } catch (err: any) {
-        console.warn("Smart contract call warning:", err);
+        console.error("Smart contract execution failed:", err);
+        setIsProcessingTx(false);
+        return;
       } finally {
         setIsProcessingTx(false);
       }
@@ -173,9 +179,8 @@ export default function ConsentPage() {
           <div className="glass-card rounded-[32px] mt-8! border border-white/5 overflow-hidden divide-y divide-white/[0.03]">
             {history.map(req => (
               <div key={req.id} className="flex items-center gap-6 pl-24 pr-10 py-8! group hover:bg-white/[0.01] transition-colors">
-                <div className={`flex h-12 w-12 ml-8! shrink-0 items-center justify-center rounded-2xl border transition-all duration-500 ${
-                  req.status === "denied" ? "bg-red-500/5 border-red-500/10 text-red-500" : "bg-white/[0.02] border-white/5 text-zinc-500"
-                }`}>
+                <div className={`flex h-12 w-12 ml-8! shrink-0 items-center justify-center rounded-2xl border transition-all duration-500 ${req.status === "denied" ? "bg-red-500/5 border-red-500/10 text-red-500" : "bg-white/[0.02] border-white/5 text-zinc-500"
+                  }`}>
                   {req.status === "denied" ? <ShieldAlert size={22} /> : <TimerOff size={22} />}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -186,11 +191,10 @@ export default function ConsentPage() {
                     <span className="tracking-tight opacity-70">{formatRequestedAt(req.requestedAt)}</span>
                   </div>
                 </div>
-                <span className={`text-[10px] mr-8! font-bold px-4 py-2 rounded-full border tracking-widest uppercase whitespace-nowrap ${
-                  req.status === "denied"
-                    ? "bg-red-500/5 border-red-500/10 text-red-400"
-                    : "bg-white/[0.02] border-white/5 text-zinc-500"
-                }`}>
+                <span className={`text-[10px] mr-8! font-bold px-4 py-2 rounded-full border tracking-widest uppercase whitespace-nowrap ${req.status === "denied"
+                  ? "bg-red-500/5 border-red-500/10 text-red-400"
+                  : "bg-white/[0.02] border-white/5 text-zinc-500"
+                  }`}>
                   {req.status === "denied" ? "Access Denied" : "Expired"}
                 </span>
               </div>
@@ -313,9 +317,8 @@ function ActiveAccessCard({ req, onRevoke, onDismiss }: { req: AccessRequest; on
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400/70">{req.speciality}</p>
             </div>
             <span
-              className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] ${
-                isRevoked ? "text-red-400" : "text-emerald-400"
-              }`}
+              className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] ${isRevoked ? "text-red-400" : "text-emerald-400"
+                }`}
             >
               {isRevoked ? <TimerOff size={14} /> : <CheckCircle2 size={14} />} {isRevoked ? "Revoked" : "Approved"}
             </span>
